@@ -1,0 +1,291 @@
+%% For double-blind review submission, w/o CCS and ACM Reference (max submission space)
+\documentclass[10pt, sigplan]{acmart}
+%%\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For double-blind review submission, w/ CCS and ACM Reference
+%\documentclass[sigplan,10pt,review,anonymous]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission, w/o CCS and ACM Reference (max submission space)
+%\documentclass[sigplan,10pt,review]{acmart}\settopmatter{printfolios=true,printccs=false,printacmref=false}
+%% For single-blind review submission, w/ CCS and ACM Reference
+%\documentclass[sigplan,10pt,review]{acmart}\settopmatter{printfolios=true}
+%% For final camera-ready submission, w/ required CCS and ACM Reference
+%\documentclass[sigplan,10pt]{acmart}\settopmatter{}
+
+
+%% Conference information
+%% Supplied to authors by publisher for camera-ready submission;
+%% use defaults for review submission.
+%\acmConference[PL'17]{ACM SIGPLAN Conference on Programming Languages}{January 01--03, 2017}{New York, NY, USA}
+%\acmYear{2017}
+%\acmISBN{} % \acmISBN{978-x-xxxx-xxxx-x/YY/MM}
+%\acmDOI{} % \acmDOI{10.1145/nnnnnnn.nnnnnnn}
+%\startPage{1}
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission;
+%% use 'none' for review submission.
+\setcopyright{none}
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2017}           %% If different from \acmYear
+
+%% Bibliography style
+%%\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%\citestyle{acmauthoryear}  %% For author/year citations
+%\citestyle{acmnumeric}     %% For numeric citations
+%\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
+                            %% sorting of references within a single citation;
+                            %% e.g., \cite{Smith99,Carpenter05,Baker12}
+                            %% rendered as [14,5,2] rather than [2,5,14].
+%\setcitesyle{nocompress}   %% With 'acmnumeric', to disable automatic
+                            %% compression of sequential references within a
+                            %% single citation;
+                            %% e.g., \cite{Baker12,Baker14,Baker16}
+                            %% rendered as [2,3,4] rather than [2-4].
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+%% Note: Authors migrating a paper from traditional SIGPLAN
+%% proceedings format to PACMPL format must update the
+%% '\documentclass' and topmatter commands above; see
+%% 'acmart-pacmpl-template.tex'.
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+
+\begin{document}
+
+%% Title information
+\title[Short Title]{Assessing primitives performance on multi-stage execution}         %% [Short Title] is optional;
+                                        %% when present, will be used in
+                                        %% header instead of Full Title.
+%%\titlenote{with title note}             %% \titlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+%%\subtitle{Subtitle}                     %% \subtitle is optional
+%%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{First1 Last1}
+                                        %% can be repeated if necessary
+\affiliation{
+  \position{Position1}
+  \department{Department1}              %% \department is recommended
+  \institution{Institution1}            %% \institution is required
+  \streetaddress{Street1 Address1}
+  \city{City1}
+  \state{State1}
+  \postcode{Post-Code1}
+  \country{Country1}                    %% \country is recommended
+}
+\email{first1.last1@inst1.edu}          %% \email is recommended
+
+%% Author with two affiliations and emails.
+\author{First2 Last2}
+                                        %% can be repeated if necessary
+\affiliation{
+  \position{Position2a}
+  \department{Department2a}             %% \department is recommended
+  \institution{Institution2a}           %% \institution is required
+  \streetaddress{Street2a Address2a}
+  \city{City2a}
+  \state{State2a}
+  \postcode{Post-Code2a}
+  \country{Country2a}                   %% \country is recommended
+}
+\email{first2.last2@inst2a.com}         %% \email is recommended
+
+%% Author with two affiliations and emails.
+\author{First3 Last3}
+\affiliation{
+  \position{Position2b}
+  \department{Department2b}             %% \department is recommended
+  \institution{Institution2b}           %% \institution is required
+  \streetaddress{Street3b Address2b}
+  \city{City2b}
+  \state{State2b}
+  \postcode{Post-Code2b}
+  \country{Country2b}                   %% \country is recommended
+}
+\email{first2.last2@inst2b.org}         %% \email is recommended
+
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+Most of programming languages uses primitive functions to speed up their execution time ; these primitives usually implements core operations (like addition, substraction,...) or frequently used operations.
+They are also massively used in the context of dynamic or just-in-time compilation : the compiler then executes this alternative version instead of the standard one to gain performance.\\
+%%Problem
+Dynamic compilation is slower then static compilation: in this context, one has to set up strategies to reach higher performances. primitives can thus be implemented in the context of just in time compilation.\\ 
+%%\item Aim \\
+The Cog VM dynamically compiles oriented-object languages such as Newspeak, Pharo, Squeak: this paper describes the recent implementation of optimised versions of the String comparison primitive at different stages of the code execution and their impact on execution time.
+%%\item Perspectives \\
+[describes briefly the 3 implementations and compares with V8 and Java?]\\
+
+\end{abstract}
+
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+%\begin{CCSXML}
+%<ccs2012>
+%<concept>
+%<concept_id>10011007.10011006.10011008</concept_id>
+%<concept_desc>Software and its engineering~General programming languages</concept_desc>
+%<concept_significance>500</concept_significance>
+%</concept>
+%<concept>
+%<concept_id>10003456.10003457.10003521.10003525</concept_id>
+%<concept_desc>Social and professional topics~History of programming languages</concept_desc>
+%<concept_significance>300</concept_significance>
+%</concept>
+%</ccs2012>
+%\end{CCSXML}
+
+%\ccsdesc[500]{Software and its engineering~General programming languages}
+%\ccsdesc[300]{Social and professional topics~History of programming languages}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+%%\keywords{keyword1, keyword2, keyword3}  %% \keywords are mandatory in final camera-ready submission
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+
+\section{Introduction}
+
+Short description of the String class (String, ByteString, WideString)?
+
+\section{Terminology}
+
+\subsection{definitions}
+\begin{itemize}
+	\item primitive (but already defined in abstract?)
+	\item 
+\end{itemize}
+
+
+Understanding primitive implementation and execution
+
+\subsection{MiscPlugin}
+Code compiled into bytecode and interpreted\\
+trade-off 
+\begin{itemize}
+	\item +: easy to code, easy to read, implementation in-image, no need to recompile th vm sources in case of modification
+	\item -: slow
+\end{itemize}
+
+\subsection{primitive in Slang}
+Slang is compiled to C (by usual c compilers gcc/llvm), and the resulting machine code is executed\\
+trade-off
+\begin{itemize}
+	\item +: faster execution
+	\item -: costly jumps between Smalltalk and C runtime (trampolines), need to recompile vm sources, little control over outcome (c compilers optimizations)
+\end{itemize}
+
+\subsection{primitive in baseline JIT}
+generate functions as machine code
+partial implementation (frequent cases are implemented)
+Sometimes, fallback to less-optimised version\\
+
+trade-off
+\begin{itemize}
+	\item +: faster (faster) execution (no c - Smalltalk runtime jumps), control over the outcome
+	\item -: need to recompile vm sources (trampolines), code readability 
+\end{itemize}
+
+\subsection{primitive in optimizing JIT}
+
+
+add appendix with code
+
+
+
+\section{Assessment}
+All these versions of the primitives have been implemented. Compare performances
+
+\subsection{Micro-benchmarks}
+Results on strings of different lengths (3, 10, 1000)
+
+\subsection{Macro-benchmarks}
+JSON
+PetitParser
+XML
+
+
+\section{Related work}
+
+\begin{itemize}
+	\item Java: platform dependent
+	\item V8: interpreter compiled by JIT
+	optimised backend
+	as if we were compiling slang using the JIT compiler (ahead of time)
+	no more virtual call
+	\item VisualWorks: baseline JIT but no interpreter
+\end{itemize}
+
+
+\section{Future work and conclusion}
+1. number of representations\\
+2. common representation
+
+
+
+%% Acknowledgments
+%%\begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+%  This material is based upon work supported by the
+%  \grantsponsor{GS100000001}{National Science
+%    Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+%  No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+%  No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+%  conclusions or recommendations expressed in this material are those
+%  of the author and do not necessarily reflect the views of the
+%  National Science Foundation.
+%\end{acks}
+
+
+%% Bibliography
+%\bibliography{bibfile}
+
+
+%% Appendix
+\appendix
+\section{Appendix}
+
+Text of appendix \ldots
+
+\end{document}
