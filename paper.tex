@@ -59,32 +59,21 @@
                         %% http://ctan.org/pkg/booktabs
 \usepackage{subcaption} %% For complex figures with subfigures/subcaptions
                         %% http://ctan.org/pkg/subcaption
+\usepackage{xspace}
+\usepackage{graphicx}
+\usepackage{ifthen}
+%\input{macros.tex}
+
+\usepackage{xcolor}
+\newcommand{\sd}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Stef:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
+\newcommand{\sk}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
+\newcommand{\cb}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 
 
 \begin{document}
 
 %% Title information
-\title[Short Title]{Assessing primitives performance on multi-stage execution}         %% [Short Title] is optional;
-                                        %% when present, will be used in
-                                        %% header instead of Full Title.
-%%\titlenote{with title note}             %% \titlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
-%%\subtitle{Subtitle}                     %% \subtitle is optional
-%%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
-                                        %% can be repeated if necessary;
-                                        %% contents suppressed with 'anonymous'
-
-
-%% Author information
-%% Contents and number of authors suppressed with 'anonymous'.
-%% Each author should be introduced by \author, followed by
-%% \authornote (optional), \orcid (optional), \affiliation, and
-%% \email.
-%% An author may have multiple affiliations and/or emails; repeat the
-%% appropriate command.
-%% Many elements are not rendered, but should be provided for metadata
-%% extraction tools.
+\title[Short Title]{Assessing primitives performance\\ on multi-stage execution}       
 
 %% Author with single affiliation.
 \author{First1 Last1}
@@ -135,15 +124,16 @@
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
-Most of programming languages uses primitive functions to speed up their execution time ; these primitives usually implements core operations (like addition, substraction,...) or frequently used operations.
-They are also massively used in the context of dynamic or just-in-time compilation : the compiler then executes this alternative version instead of the standard one to gain performance.\\
+Most of programming managed languages use primitive functions to speed up their execution time; these primitives usually implement core operations (such as addition, subtraction,...) or frequently used operations.
+They are also massively used in the context of dynamic or just-in-time compilation: the compiler then executes this alternative version instead of the standard one to gain performance.
 %%Problem
-Dynamic compilation is slower then static compilation: in this context, one has to set up strategies to reach higher performances. primitives can thus be implemented in the context of just in time compilation.\\ 
+
+One of the challenge is that dynamic compilation is slower then static compilation: in this context, one has to set up strategies to reach higher performance. In particular since execution may require crossing borders of different paradigms (assembly, C calls,...) with their associated costs. Once such strategies are understood and accessed, primitives can thus be implemented in the context of just in time compilation.
+
 %%\item Aim \\
-The Cog VM dynamically compiles oriented-object languages such as Newspeak, Pharo, Squeak: this paper describes the recent implementation of optimised versions of the String comparison primitive at different stages of the code execution and their impact on execution time.
+This paper describes and compares the recent implementation of optimised versions of the String comparison primitive at different stages of the code execution and their impact on execution time. This analysis is performed on the opensmalltalk virtual machine (known as Cog) that dynamically compiles oriented-object languages such as Newspeak, Pharo and Squeak.
 %%\item Perspectives \\
 [describes briefly the 3 implementations and compares with V8 and Java?]\\
-
 \end{abstract}
 
 
@@ -184,6 +174,11 @@ The Cog VM dynamically compiles oriented-object languages such as Newspeak, Phar
 \section{Introduction}
 
 Short description of the String class (String, ByteString, WideString)?
+
+\sd{this is a test}
+
+
+
 
 \section{Terminology}
 
