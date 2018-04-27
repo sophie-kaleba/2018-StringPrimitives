@@ -66,8 +66,8 @@
 
 \usepackage{xcolor}
 \newcommand{\sd}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Stef:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
-\newcommand{\sk}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
-\newcommand{\cb}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
+\newcommand{\sk}[1]{\color{blue}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
+\newcommand{\cba}[1]{\color{purple}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 
 
 \begin{document}
@@ -76,7 +76,7 @@
 \title[Short Title]{Assessing primitives performance\\ on multi-stage execution}       
 
 %% Author with single affiliation.
-\author{First1 Last1}
+\author{Sophie Kaleba}
                                         %% can be repeated if necessary
 \affiliation{
   \position{Position1}
@@ -91,49 +91,61 @@
 \email{first1.last1@inst1.edu}          %% \email is recommended
 
 %% Author with two affiliations and emails.
-\author{First2 Last2}
-                                        %% can be repeated if necessary
+\author{Cl\'ement B\'era}
 \affiliation{
-  \position{Position2a}
-  \department{Department2a}             %% \department is recommended
-  \institution{Institution2a}           %% \institution is required
-  \streetaddress{Street2a Address2a}
-  \city{City2a}
-  \state{State2a}
-  \postcode{Post-Code2a}
-  \country{Country2a}                   %% \country is recommended
+  % \position{}
+	\department{Software Languages Lab}              %% \department is recommended
+	\institution{Vrije Universiteit Brussel}            %% \institution is required
+	\city{Brussel}
+  % \state{}
+  % \postcode{}
+	\country{Belgium}                    %% \country is recommended
 }
-\email{first2.last2@inst2a.com}         %% \email is recommended
+\email{clement.bera@vub.ac.be}          %% \email is recommended
 
 %% Author with two affiliations and emails.
-\author{First3 Last3}
+\author{St\'ephane Ducasse}
 \affiliation{
-  \position{Position2b}
-  \department{Department2b}             %% \department is recommended
-  \institution{Institution2b}           %% \institution is required
-  \streetaddress{Street3b Address2b}
-  \city{City2b}
-  \state{State2b}
-  \postcode{Post-Code2b}
-  \country{Country2b}                   %% \country is recommended
+ % \position{Position2b}
+  \department{RMoD}             %% \department is recommended
+  \institution{Inria}           %% \institution is required
+  %\streetaddress{Street3b Address2b}
+  \city{Lille}
+  %\state{State2b}
+  %\postcode{Post-Code2b}
+  \country{France}                   %% \country is recommended
 }
-\email{first2.last2@inst2b.org}         %% \email is recommended
+\email{stephane.ducasse@inria.fr}         %% \email is recommended
 
 
 %% Abstract
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
+
 Most of programming managed languages use primitive functions to speed up their execution time; these primitives usually implement core operations (such as addition, subtraction,...) or frequently used operations.
+\cba{Le papier est sur les primitives d'optimisations, pas sur les primitives essentielles. Je parlerais que des prims d'optimisations dans l'abstract et expliquerais la difference dans l'intro.}
 They are also massively used in the context of dynamic or just-in-time compilation: the compiler then executes this alternative version instead of the standard one to gain performance.
+\cba{Il y a des problemes de terminologie. Le JIT compile, n'exécute rien. La VM exécute le code. A l'oral, par abus de langage, on peut dire le JIT execute, mais dans un papier il faut etre rigoureux}
 %%Problem
 
-One of the challenge is that dynamic compilation is slower then static compilation: in this context, one has to set up strategies to reach higher performance. In particular since execution may require crossing borders of different paradigms (assembly, C calls,...) with their associated costs. Once such strategies are understood and accessed, primitives can thus be implemented in the context of just in time compilation.
+\textbf{One of the challenge is that dynamic compilation is slower then static compilation}:
+\cba{Ce que j'ai mis en gras, je le vois en tant que reviewer de manière aussi directe, je met strong reject et je quote la phrase dans la review. Je suis un des reviewers les plus sympas d'ICOOOLPS, les autres seront plus aggressifs que ca.}
+ in this context, one has to set up strategies to reach higher performance. In particular since execution may require crossing borders of different paradigms (assembly, C calls,...) with their associated costs. Once such strategies are understood and accessed, primitives can thus be implemented in the context of just in time compilation.
+ \cba{Je comprend pas ce que tu veux dire}
+ 
+ \cba{Je me demande si c'est pas trop verbeux jusque là. Ecrire des phrases introduisant: (1) Managed runtime, (2) primitive d'optimisation, (3) la possibilité de l'implem dans le language bas niveau où est implémenté la VM comme C/C++ ou dans une representation intermédiaire du JIT. (4) les avantages / problèmes des 2 approches me parait mieux}
 
 %%\item Aim \\
-This paper describes and compares the recent implementation of optimised versions of the String comparison primitive at different stages of the code execution and their impact on execution time. This analysis is performed on the opensmalltalk virtual machine (known as Cog) that dynamically compiles oriented-object languages such as Newspeak, Pharo and Squeak.
+This paper describes and compares the recent implementation of optimised versions of the String comparison primitive \textit{at different stages of the code execution} and their impact on execution time.
+\cba{peut etre enleve ça, l'essentiel c'est ce qui est écrit avant}
+\cba{Introduit clairement a quoi corresponde chaque implem, C external lib, C internal code, back-end de JIT, etc.}
+ This analysis is performed on the opensmalltalk virtual machine (known as Cog) that dynamically compiles oriented-object languages such as Newspeak, Pharo and Squeak.
+ \cba{Verbeux, a fusionner avec une phrase sur les resultats. Peut etre mettre une phrase comme quoi ca pourrait s'appliquer a d'autres MV avec runtime LLevel C/C++ typiquement + JIT vers code natif}
 %%\item Perspectives \\
 [describes briefly the 3 implementations and compares with V8 and Java?]\\
+\cba{Personnellement je ne parlerais pas des related work dans l'abstract dans ce papier car la direction principale n'est pas une comparaison avec un related work. A la place je finirais l'abstract par une phrase sur les résultats en parlant du trade-off, genre dans la back-end du JIT la vitesse d'execution est plus fiable (pas de pb avec les differences de compil LLVM/GCC par ex), est rapide, mais par contre le cout d'ingenierie est supérieur. Il faut donc mesure l'utilisation de chaque primitive de performance et mettre un place un ratio complexité/performance }
+
 \end{abstract}
 
 
@@ -161,7 +173,7 @@ This paper describes and compares the recent implementation of optimised version
 
 %% Keywords
 %% comma separated list
-%%\keywords{keyword1, keyword2, keyword3}  %% \keywords are mandatory in final camera-ready submission
+\keywords{Just-in-Time compiler, Primitive, Virtual machine, Managed runtime}  %% \keywords are mandatory in final camera-ready submission
 
 
 %% \maketitle
@@ -173,29 +185,41 @@ This paper describes and compares the recent implementation of optimised version
 
 \section{Introduction}
 
+\cba{Ici il faut répéter l'abstract en detaillant plus chaque chose.
+Comme le coeur du papier est sur String prim, tu introduis la primitive sur laquelle tu vas travailler, dont la representation des strings, ses cas d'utilisation
+Il faut que tu précises bien le coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. Je ferais une figure. C'est important pour la suite. 
+Il faut definir primitive, primitive essentielle, primitive d'optimisation. Il faut expliquer brievement les primitives Smalltalk, comment elles sont activées, dans quelles cas le fall back code est appelé, que si elles fail c'est side-effect free. => Dans mon papier ISMM'15 il y a une explication section 4.2 le début de Primitive operations. dont tu peux t'inspirer, voir copier coller comme je suis auteur des 2.}
+
 Short description of the String class (String, ByteString, WideString)?
-
-\sd{this is a test}
-
-
-
+\cba{oui, explique la primitive, dont la representation des strings, ses cas d'utilisation}
 
 \section{Terminology}
+\cba{Je mettrais section 2 "Implementations evaluated", tu ne definis par vraiment de terminology a part la premiere subsection que je bougerais en intro}
 
+\cba{Les definitions de primitive d'optimisation et essentielles je les mettrais dans l'intro}
 \subsection{definitions}
 \begin{itemize}
-	\item primitive (but already defined in abstract?)
+	\item primitive (but already defined in abstract?) \cba{Dans le papier tu dois faire comme si l'abstract n'existait pas et tout redéfinir. Par contre tu peux définir dans l'intro}
 	\item 
 \end{itemize}
 
 
 Understanding primitive implementation and execution
 
+\cba{Je pense il faut comparer 
+(1) Smalltalk pur (ta baseline, pas grand chose à discuter, tu peux exprimer les autres en relative speed-up par rapport a la baseline dans les graphes de resultats.)
+(2) SmalltalkSmartSyntax + Misc
+(3) SlangSmartSyntax + Misc, 
+(4) Slang, 
+(5) Cog's RTL
+(6) eventuellement Cog's x86 back-end si tu veux faire une implem spécifique a x86 en plus avec SSE4.}
+\cba{Dans les parties suivante tu définis chaque cas, tu évalues les perfs sur micro et macro benchmarks, tu discutes le code machine généré par les compilo C et le JIT, tu montres les boucles de comparaison ASM générées par les compilo C et le JIT et u mets l'intégralité des fonctions avec tous les codes sources et générés en appendices.}
+
 \subsection{MiscPlugin}
 Code compiled into bytecode and interpreted\\
 trade-off 
 \begin{itemize}
-	\item +: easy to code, easy to read, implementation in-image, no need to recompile th vm sources in case of modification
+	\item +: easy to code, easy to read, implementation in-image, no need to recompile th vm sources in case of modification \cba{Ah bon, Y'a pas besoin de recompiler les sources en cas de modif VM? Ca sort d'ou ca? Le problème est que l'image VMMaker qui génère le code C de la VM utilise sa version de la primitive justement}
 	\item -: slow
 \end{itemize}
 
@@ -203,7 +227,7 @@ trade-off
 Slang is compiled to C (by usual c compilers gcc/llvm), and the resulting machine code is executed\\
 trade-off
 \begin{itemize}
-	\item +: faster execution
+	\item +: faster execution \cba{Pourquoi c'est plus rapide? Access to VM internal API, etc.}
 	\item -: costly jumps between Smalltalk and C runtime (trampolines), need to recompile vm sources, little control over outcome (c compilers optimizations)
 \end{itemize}
 
@@ -224,6 +248,7 @@ trade-off
 add appendix with code
 
 
+\cba{Future work -> primitive processor dependent (i.e. SSE4 instrs), pros and cons and why you did not do it (ingeniering cost per back-end)}
 
 \section{Assessment}
 All these versions of the primitives have been implemented. Compare performances
@@ -248,12 +273,15 @@ XML
 	\item VisualWorks: baseline JIT but no interpreter
 \end{itemize}
 
+\cba{Ajoute le related work que tu as trouvé de ICOOOLPS avec le travail de Tim.}
 
 \section{Future work and conclusion}
 1. number of representations\\
 2. common representation
 
-
+\cba{Ici tu mets 
+(6) eventuellement Cog's x86 back-end si tu veux faire une implem spécifique a x86 en plus avec SSE4.
+si tu l'as pas mis avant}
 
 %% Acknowledgments
 %%\begin{acks}                            %% acks environment is optional
@@ -280,6 +308,8 @@ XML
 %% Appendix
 \appendix
 \section{Appendix}
+
+\cba{Source code et generated C and ASM code for all versions}
 
 Text of appendix \ldots
 
