@@ -201,73 +201,65 @@ Section \ref{sec:VMCompil} describes briefly the implementation languages and co
 \subsection{VM compilation}
 \label{sec:VMCompil}
 
-Similar to \cite{RPythonToolchain}
-
-Impl langage. JIT.
-
-Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM,
-
 \begin{figure}[tb]
 		\centering
 		\includegraphics[width=0.6\linewidth]{figures/VMCompilation}
-		\caption{VM compilation}
+		\caption{Cog VM compilation}
 		\label{fig:VMCompilation}
 \end{figure}
 
+Most of the Cog VM code base is written in Slang, a subset of Smalltalk. Slang is compiled to C and then to native code through standard C compilers. The execution engine (the memory manager, the interpreter and the baseline JIT) are entirely written in Slang. The two main purposes of using slang code over plain C are:
+\begin{itemize}
+	\item to specify with annotations what function needs to be inlined or duplicated with constant parameters, and
+	\item to be able to simulate VM execution, executing the Slang code as Smalltalk code on top of a compiled VM for debugging purposes.
+\end{itemize}
+
+The executable is generated in two steps as shown on Figure \ref{fig:VMCompilation}, similarly to the RPython toolchain \cite{RPythonToolchain}. The first step is to generate the two C files representing the whole execution engine written in Slang using the Slang-to-C compiler. During the second step, a C compiler is called to compile the execution engine and the platform-specific code written directly in C to the executable VM.
 
 \subsection{VM execution}
 \label{sec:VMexec}
+
+%TODO
+
+primitive implemented in C or Cog's back-end.
 
 exec hybrid interp 
  au runtime JIT ST->ASM)
  execution with C and St stack
 
-Il faut que tu précises bien le coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. C'est important pour la suite. 
+coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. C'est important pour la suite. 
 
 \subsection{Primitive execution}
 \label{sec:primExec}
 
+In the Cog VM, primitives are always associated with compiled methods. A compiled method has information in its header to inform the virtual machine if it has a primitive operation or not. When activating a method with a primitive, the primitive function is executed before the method's bytecode. If the primitive succeeds, the primitive returns a result, as if it were the result of the virtual call. If the primitive fails, it does so without side-effects and execution continues executing the method's bytecode, as if the primitive had not been present.
 
- Il faut definir primitive, primitive essentielle, primitive d'optimisation. Il faut expliquer brievement les primitives Smalltalk, comment elles sont activées, dans quelles cas le fall back code est appelé, que si elles fail c'est side-effect free. => Dans mon papier ISMM'15 il y a une explication section 4.2 le début de Primitive operations. dont tu peux t'inspirer, voir copier coller comme je suis auteur des 2.
-
-primitive performance: VM without opt JIT, before reaching peak perf, or jit incorrectly optimizing specific part of code.
-
+To fail without side-effects a primitive must validate any parameters and any state fetched from them, before changing execution state by performing its operations. Validation involves any of testing for a specific class, testing for bit vs pointer objects, bounds checks, and recursively applying these tests to substructure of the parameters. For example, the primitive that installs a cursor examines the first parameter to check that it represents a valid cursor object, comprised of two bitmaps, one for the image and one for the shape, plus a point to specify the cursor's hotspot. 
 
 \subsection{String comparison primitive}
 \label{subsec:primSpec}
 
-Section \ref{subsec:context} explain why we changed it.
-
- Comme le coeur du papier est sur String prim, tu introduis la primitive sur laquelle tu vas travailler, dont la representation des strings, ses cas d'utilisation
- Short description of the String class (String, ByteString, WideString)?
+\cba{Cette partie je faisais la queue dans la gare en mm temps, a relire}
+ 
+ The primitive specification is a bit tedious to explain, since as we were trying to improve its performance, we had to change the specifications. In this section we describe first the string implementation, then the original primitive specification and why they were problematic and lastly the new specifications.
+ 
+\paragraph{String representations.} Strings are represented in all programming languages on top of the Cog VM in two possible forms, ByteStrings and WideStrings. ByteStrings encode each character of the string in a single byte. The encoding usually follows the extended ASCII standard. WideStrings encode each character of the string in 32 bits. The encoding usually follows Unicode specifications. In this paper, we will discuss only the implementation of the string comparison primitive for ByteStrings. WideStrings use an implementation entirely implemented in the client language, and so far, it has not been reported as a performance bottleneck for any program of any users. To sort arrays of strings, strings can be compared. They can be compared in the default order (ASCII or Unicode) or using different orders, for example, the case insensitive order.
+ 
+\paragraph{Original specification.}  The original primitive took three operands. The two first operands were the two ByteStrings to compare and the third operand is the order table, a ByteArray encoding the order of characters. The default order is the ASCII order, hence each entry corresponds to its index in the byte array (The ByteArray has a size of 256, and accessing the element i, with 0 <= i <= 255, answered i). However, in some case, the program may do case insensitive ByteStrings comparison. In this case, the order ByteArray is different, since some entries answer the same value (for example, the entry for the 41 and 61, respectively characters A and a, both answer the same value). To compare the two ByteStrings, the primitive conceptually iterates byte by byte over the two objects until it reaches the end of one them, comparing for each byte that the value present in the order ByteArray at the index is greater, equal or smaller than the value computed from the other ByteString. If a difference is met, the value returns based on the result, if not, at the end of the iteration the primitive compares the ByteString sizes and returns. Based on the three parameters, the primitive answered 3,2 or 1 depending if the first ByteString was greater, equal or smaller than the second one.
+ 
+\paragraph{Specification issues.} As we were trying to optimize string comparison but specifically string equality, we encountered two main issues:
+\begin{itemize}
+	\item \emph{Returned value:} Other programming languages implement the primitive to return a negative integer, 0 or a positive integer instead of 1,2 or 3. It looks like a minor difference, but it is quite important for performance. With a negative, 0 or positive value, the primitive can just answer the difference between two different characters or the difference in size if all first characters are equal. With 1,2 or 3, the primitive has to end with multiple branches to know what number to return. In native code, a subtraction is on common architecture quicker to perform than one or multiple branches. In addition, the primitive code is easier to write with the subtraction when writing directly the assembly instructions and we did exactly that when writing the primitive on top of the JIT's back-end.
+	\item \emph{Order:} Having the order as the third operands is convenient in some cases (case insensitive comparison), but is just overhead in the common case (checking for string equality).
+\end{itemize} 
+ 
+\paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative value if the first parameter is smaller than the second, 0 if they are equal, and a positive value if the first parameter is greater than the second one.
 
 \section{Different primitive implementations}
 \label{sec:implem}
  
- \subsection{Context}
- \label{subsec:context}
+ \cba{petite intro avec plan de section}
  
- \cba{Move that to past section?}
- 
- [Max 1/2 page, justifie 1,2,3 et non neg,0,pos]
- 
-We had SmartSyntax primitive.
-Explain 1,2,3 results
-Problem compatibility other languages
-expect neg,0,pos
-
-Wanting to improve performance
-
-2 critical problems:
-(1) changing the prim => changing all clients (VM compil from Pharo or Squeak different results)
-(2) no support in SmartSyntax for read-only objects. [plugins but not String comparison]
-
-Premiere tentative Eliot -> Slang plugin. Keep 1,2,3. Resoud Read-only / changing the prim problems.
-
-Deuxieme tentative Slang internal, then Cog's RTL.
-=> pour simplifier le RTL neg,0,pos etait mieux => minus instead of branches.
-=> compat execution model, Slang internal neg,0, pos too.
-
  \subsection{Different implementation and execution}
  
 - Pure Smalltalk: baseline
@@ -276,12 +268,15 @@ Write down the Smalltalk code here.
 Expliquer to:do: over do: (to explain expresiveness) => core lib often use to:do: and not do:
 
 - Smart Syntax Plugin
+%CHECK how to import code env in latex.
+%\begin{code}
 %= aString 	
 %	self == aString ifTrue: [ ^true ].
 %	aString isString ifFalse: [ ^false ].
 %	self size = aString size ifFalse: [ ^false ].
-%	1 to: self size do: [:i | (self at: i) = (aString at: i) ifFalse: [^false] ].
+%	1 to: self size do: [:i | (self at: i) = (aString at: i) ifFalse: [ ^ false ] ].
 %	^ true
+%\end{code}
 Restricted Smalltalk
 
 written in Smalltalk with restrictions.
@@ -344,6 +339,7 @@ LLVM eval Mac OS X + machine spec.
 \subsection{Micro-benchmarks}
 Results on strings of different lengths (3, 10, 1000)
 
+\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
 4 string length. (1er <=3, dernier > 1000) 
 line 1: GCC
 line 2: LLVM
