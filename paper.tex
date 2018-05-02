@@ -31,10 +31,10 @@
 %\copyrightyear{2017}           %% If different from \acmYear
 
 %% Bibliography style
-%%\bibliographystyle{ACM-Reference-Format}
+\bibliographystyle{ACM-Reference-Format}
 %% Citation style
 %\citestyle{acmauthoryear}  %% For author/year citations
-%\citestyle{acmnumeric}     %% For numeric citations
+\citestyle{acmnumeric}     %% For numeric citations
 %\setcitestyle{nosort}      %% With 'acmnumeric', to disable automatic
                             %% sorting of references within a single citation;
                             %% e.g., \cite{Smith99,Carpenter05,Baker12}
@@ -166,32 +166,44 @@ The paper shows that the implementation with the most reliable and high performa
 
 
 \section{Introduction}
+\label{sec:intro}
 
-%Managed lang
+High level object oriented programming languages are often implemented on top of a virtual machine (VM). As VMs has become more popular, different techniques have been set-up using Just-In-Time (JIT) compilation to improve the overall performance of the runtime such as method JITs \cite{ursPHD} which usually compile methods to native code and tracing JITs \cite{Dynamo, PyPyTracing} which usually compile linear traces of execution into native code. 
 
-Dynamically typed programming languages are traditionally
-implemented as virtual machines (VMs). As the popularity
-of VM-based languages has increased, VM implementation
-techniques have evolved to the point where most mature
-VMs utilize some form of just-in-time (JIT) compilation, with
-two main technologies contending at the moment: method
-JITs [12], which generally compile methods at a time into
-machine code, and utilize techniques such as inlining and
-branch pruning to simplify the code or merge multiple methods;
-and tracing JITs [1], which record the actions of the
-program including branches taken and methods dispatched
-into a specific trace and compile it into machine code
+On top of its virtual machine, the client language can use a set of \emph{primitives}~\footnote{We use in the paper the Smalltalk terminology (primitive) as this is the programming language used for our evaluation. Some other programming languages, such as Javascript, prefer to use the term built-in instead of primitive.}, which are performed directly by the interpreter rather than by evaluating expressions in a method. We distinguish two kinds of primitives:
+\begin{itemize}
+	\item \emph{Essential primitives} cannot be performed in any other way. A high-level object oriented language without primitives can move values from one variable to another, but cannot add two integers together. Many arithmetic and comparison operations between numbers are primitives. Some primitives allow to communicate with I/O devices such as the disk, the display and the keyboard. 	\item \emph{Optional primitives} exist only to make the system run faster. They can be implemented in the client language directly, making its implementation as a primitive optional, but they are implemented in the VM to improve performance.
+\end{itemize}
 
-Define JIT VM acronym
+The implementation of an optional primitive in the VM rather than the client language improves performance but also often increases the implementation engineering cost. For example, accessing objects in the VM usually requires some understanding of the memory layout or implementation details, which are not needed in the client language. 
 
-\subsection{Primitive execution}
+For this reason, some virtual machine implementors attempted to remove most or all optional primitives. Their goal was to improve the execution of the client language with a JIT performing speculative optimizations \cite{ursPHD} for the execution of the optional primitives implemented in the client language to be as fast as the performance of the same primitives written in the VM. Self \cite{ursPHD} and Strongtalk \cite{Strongtalk} were to first to try this approach. Early versions of the Javascript engine V8 \cite{V8} also implemented most of the primitives, including for example Array operations, in Javascript itself. However, without optional primitives implemented in the VM, several problems rise:
+\begin{itemize}
+	\item High performance relies on a JIT with speculative optimizations, which is hard to implement, maintain and evolve,
+	\item The performance of the code not yet optimized is much worse than the peak performance code,
+	\item Even mature JIT fail to optimize some narrow cases, where the performance is drastically slower.
+\end{itemize}
+Overall, this approach requires high engineering time to get a mature optimizing JIT with speculative optimizations and even then, it leads in practice to unreliable performance. 
 
- prim, optional and essential MENTION built-in
- Il faut definir primitive, primitive essentielle, primitive d'optimisation. Il faut expliquer brievement les primitives Smalltalk, comment elles sont activées, dans quelles cas le fall back code est appelé, que si elles fail c'est side-effect free. => Dans mon papier ISMM'15 il y a une explication section 4.2 le début de Primitive operations. dont tu peux t'inspirer, voir copier coller comme je suis auteur des 2.
+VMs are traditionally implemented in a low-level language such as C or C++. To balance between memory footprint, start-up performance and peak performance, the execution of code is usually done through multiple execution tiers: the first few executions of a code snippets are done through an interpreter and the JIT compiles at runtime the frequently used code snippets for further executions to be performed quicker. This leads to annoying concerns. For example, let's say we implement a primitive in C. Frequently used portion of code calling that primitive are going to be compiled to native code by the JIT. This is problematic since the native code generated by the JIT is not directly compatible with native code generated by the C compiler: a call from one to another may require to edit the stack pointer and the frame pointer from the client stack to the C stack and to spill or move multiple registers. Switching between both can waste up to around a dozen native instructions. If the primitive is going to execute many instructions, the switch overhead might be negligible, but if the primitive executes only a few instructions, the overhead can be noticeable.
 
-primitive performance: VM without opt JIT, before reaching peak perf, or jit incorrectly optimizing specific part of code.
+In the paper, we took the example of a string comparison optional primitive. The primitive compares two strings and answers if one string is greater, equal or lower than the other string. The exact specification are detailed in Section \ref{subsec:primSpec}. We implemented a first version in Smalltalk. We then implemented multiple version compiling through C compilers to native code, using different part of our VM infrastructure. Lastly, we implemented a version in the back-end of the JIT. Each time, we tried to write the code in the most efficient way possible. Then, we compared the execution time of all versions, showing that overall the most complex implementation is the fastest to execute.
 
-\subsection{VM execution model}
+Section \ref{sec:implContext} describes our implementation context, \emph{i.e.,} the execution model of the VM we used for our evaluation, how it executes primitives and the specification of our string comparison primitive. Section \ref{sec:implem} details the various implementations of the primitive we used for the evaluation. In Section \ref{sec:eval}, we evaluate the performance of the different implementations with different C compilers and string sizes. We also show the native code of the performance critical part of the primitive generated by each version and discuss it. Further sections compare our work to related works, discuss future work and conclude.
+
+\section{Implementation context}
+\label{sec:implContext}
+
+Our evaluation is based on the Cog 
+
+\subsection{VM execution.}
+
+\cite{blueBook}
+\cite{PharoByExample,SqueakByExample, NewspeakOopsla}
+\cite{BackToTheFuture, CogJIT}
+exec hybrid interp JIT.
+
+Impl langage.
 
 Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM, au runtime JIT ST->ASM)
  execution with C and St stack
@@ -203,16 +215,31 @@ Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM, au r
 		\label{fig:VMCompilation}
 \end{figure}
 
- Il faut que tu précises bien le coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. Je ferais une figure. C'est important pour la suite. 
+Il faut que tu précises bien le coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. C'est important pour la suite. 
 
-\subsection{String comparison primitive}
+\subsection{Primitive execution.}
+
+
+ Il faut definir primitive, primitive essentielle, primitive d'optimisation. Il faut expliquer brievement les primitives Smalltalk, comment elles sont activées, dans quelles cas le fall back code est appelé, que si elles fail c'est side-effect free. => Dans mon papier ISMM'15 il y a une explication section 4.2 le début de Primitive operations. dont tu peux t'inspirer, voir copier coller comme je suis auteur des 2.
+
+primitive performance: VM without opt JIT, before reaching peak perf, or jit incorrectly optimizing specific part of code.
+
+
+\subsection{String comparison primitive.}
+\label{subsec:primSpec}
+
+Section \ref{subsec:context} explain why we changed it.
 
  Comme le coeur du papier est sur String prim, tu introduis la primitive sur laquelle tu vas travailler, dont la representation des strings, ses cas d'utilisation
  Short description of the String class (String, ByteString, WideString)?
 
 \section{Different primitive implementations}
+\label{sec:implem}
  
  \subsection{Context}
+ \label{subsec:context}
+ 
+ \cba{Move that to past section?}
  
  [Max 1/2 page, justifie 1,2,3 et non neg,0,pos]
  
@@ -297,6 +324,8 @@ Trade-off engineering time and performance.
 %%%%%
 
 \section{Evaluation}
+\label{sec:eval}
+
 All these versions of the primitives have been implemented. Compare performances
 
 \subsection{Set-up}
@@ -320,15 +349,21 @@ JSON
 
 \section{Related work}
 
-\begin{itemize}
+Work on reducing the number of prim
+
+RPython \cite{NoPrimTracing}
+
+Self - Strongtalk -> tout en Smalltalk avec mature optimizing JIT. pb baseline perf, haut cout de maintenance implem pour l'adaptive optimizer \cite{Strongtalk, ursPHD}
+
+
 	%\item Java: platform dependent
-	\item V8: interpreter compiled by JIT
+	 V8: interpreter compiled by JIT \cite{V8} Mention Ignition.
 	optimised backend
 	as if we were compiling slang using the JIT compiler (ahead of time)
 	no more virtual call
-	\item VisualWorks: baseline JIT but no interpreter => only 1 implement to write and maintain.
-	\item Self - Strongtalk -> tout en Smalltalk avec mature optimizing JIT. pb baseline perf, haut cout de maintenance implem pour l'adaptive optimizer
-\end{itemize}
+	
+ VisualWorks: baseline JIT but no interpreter => only 1 implement to write and maintain.
+
 
 \cba{Ajoute le related work que tu as trouvé de ICOOOLPS avec le travail de Tim.}
 
@@ -360,7 +395,7 @@ Conclusion: trade off expressiveness performance
 
 
 %% Bibliography
-%\bibliography{bibfile}
+\bibliography{sista}
 
 
 %% Appendix
