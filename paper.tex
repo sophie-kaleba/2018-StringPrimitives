@@ -73,7 +73,7 @@
 \begin{document}
 
 %% Title information
-\title[Short Title]{Assessing primitives performance\\ on multi-stage execution}       
+\title[Assessing primitives performance on multi-stage execution]{Assessing primitives performance\\ on multi-stage execution}       
 
 %% Author with single affiliation.
 \author{Sophie Kaleba}
@@ -194,19 +194,18 @@ Section \ref{sec:implContext} describes our implementation context, \emph{i.e.,}
 \section{Implementation context}
 \label{sec:implContext}
 
-Our evaluation is based on the Cog 
+Our evaluation is based on the Cog VM a Smalltalk virtual machine. The Cog VM is based on Dan Ingalls' Smalltalk VM \cite{BackToTheFuture} and have been enhanced with a JIT \cite{CogJIT} compiling one method or closure at a time to native code. Historically, the VM implemented a 32-bits adaptation of the Smalltalk-80 specifications \cite{blueBook}, but the Cog VM is now the default VM for multiple programming languages such as Pharo \cite{PharoByExample}, Squeak \cite{SqueakByExample} and Newspeak \cite{NewspeakOopsla}. 
 
-\subsection{VM execution.}
+Section \ref{sec:VMCompil} describes briefly the implementation languages and compilation process of the Cog VM. Section \ref{sec:VMexec} explains briefly the hybrid execution model with an interpreter and a JIT. In Section \ref{sec:primExec}, we detail how primitives are executed. Section \ref{subsec:primSpec} discusses the specifications of the string comparison primitive used for our evaluation.
 
-\cite{blueBook}
-\cite{PharoByExample,SqueakByExample, NewspeakOopsla}
-\cite{BackToTheFuture, CogJIT}
-exec hybrid interp JIT.
+\subsection{VM compilation}
+\label{sec:VMCompil}
 
-Impl langage.
+Similar to \cite{RPythonToolchain}
 
-Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM, au runtime JIT ST->ASM)
- execution with C and St stack
+Impl langage. JIT.
+
+Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM,
 
 \begin{figure}[tb]
 		\centering
@@ -215,9 +214,18 @@ Il faut expliquer le process de compilation de la VM. (Slang -> C, C-> ASM, au r
 		\label{fig:VMCompilation}
 \end{figure}
 
+
+\subsection{VM execution}
+\label{sec:VMexec}
+
+exec hybrid interp 
+ au runtime JIT ST->ASM)
+ execution with C and St stack
+
 Il faut que tu précises bien le coût de changement entre la pile St et la pile C et que tu expliques le probleme des primitives C courtes appelées depuis le code généré par le JIT. C'est important pour la suite. 
 
-\subsection{Primitive execution.}
+\subsection{Primitive execution}
+\label{sec:primExec}
 
 
  Il faut definir primitive, primitive essentielle, primitive d'optimisation. Il faut expliquer brievement les primitives Smalltalk, comment elles sont activées, dans quelles cas le fall back code est appelé, que si elles fail c'est side-effect free. => Dans mon papier ISMM'15 il y a une explication section 4.2 le début de Primitive operations. dont tu peux t'inspirer, voir copier coller comme je suis auteur des 2.
@@ -225,7 +233,7 @@ Il faut que tu précises bien le coût de changement entre la pile St et la pile C
 primitive performance: VM without opt JIT, before reaching peak perf, or jit incorrectly optimizing specific part of code.
 
 
-\subsection{String comparison primitive.}
+\subsection{String comparison primitive}
 \label{subsec:primSpec}
 
 Section \ref{subsec:context} explain why we changed it.
