@@ -62,6 +62,8 @@
 \usepackage{xspace}
 \usepackage{graphicx}
 \usepackage{ifthen}
+\usepackage{pgfplots}
+\usepgfplotslibrary{statistics}
 %\input{macros.tex}
 
 \usepackage{xcolor}
@@ -284,11 +286,6 @@ To fail without side-effects a primitive must validate any parameters and any st
 : baseline
 Smalltalk code on top of VM. Used as our baseline for benchmarks.
 Write down the Smalltalk code here.
-Expliquer to:do: over do: (to explain expresiveness) => core lib often use to:do: and not do:
-
-New spec
-
-\paragraph{Existing: Smart Syntax Plugin.}
 %CHECK how to import code env in latex.
 %Note we're talking about comparison, not =, so not sure we should show = or bench =
 %\begin{code}
@@ -299,6 +296,11 @@ New spec
 %	1 to: self size do: [:i | (self at: i) = (aString at: i) ifFalse: [ ^ false ] ].
 %	^ true
 %\end{code}
+Expliquer to:do: over do: (to explain expresiveness) => core lib often use to:do: and not do:
+
+New spec
+
+\paragraph{Existing: Smart Syntax Plugin.}
 Restricted Smalltalk
 
 written in Smalltalk with restrictions.
@@ -370,6 +372,173 @@ LLVM eval Mac OS X + machine spec.
 \subsection{Micro-benchmarks}
 Results on strings of different lengths (3, 10, 1000)
 
+taille 0
+
+\begin{tikzpicture}
+  \begin{axis}
+  [
+boxplot/draw direction
+=y,
+    xtick={1,2,3},
+    xticklabels={Plugin, Slang, Slang+JIT},
+    ]
+    \addplot+[
+    boxplot prepared={
+      median=2.942,
+      upper quartile=2.977,
+      lower quartile=2.911,
+      upper whisker=3.098,
+      lower whisker=2.797
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.9594,
+      upper quartile=0.9791,
+      lower quartile=0.9230,
+      upper whisker=1.1059,
+      lower whisker=0.8705
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.4258,
+      upper quartile=0.4310,
+      lower quartile=0.4227,
+      upper whisker=0.5181,
+      lower whisker=0.4074
+    },
+    ] coordinates {};
+  \end{axis}
+\end{tikzpicture}
+
+taille 5
+
+\begin{tikzpicture}
+  \begin{axis}
+  [
+boxplot/draw direction=y,
+    xtick={1,2,3},
+    xticklabels={Plugin, Slang, Slang+JIT},
+    ]
+    \addplot+[
+    boxplot prepared={
+      median=0.6904,
+      upper quartile=0.6998,
+      lower quartile=0.6835,
+      upper whisker=0.7353,
+      lower whisker=0.6407
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.2530,
+      upper quartile=0.2594,
+      lower quartile=0.2449,
+      upper whisker=0.2836,
+      lower whisker=0.2323
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.1455,
+      upper quartile=0.1475,
+      lower quartile=0.1425,
+      upper whisker=0.1636,
+      lower whisker=0.1266
+    },
+    ] coordinates {};
+  \end{axis}
+\end{tikzpicture}
+
+taille 100
+\begin{tikzpicture}
+  \begin{axis}
+  [
+boxplot/draw direction=y,
+    xtick={1,2,3},
+    xticklabels={Plugin, Slang, Slang+JIT},
+    ]
+    \addplot+[
+    boxplot prepared={
+      median=0.10378,
+      upper quartile=0.10435,
+      lower quartile=0.10355,
+      upper whisker=0.10586,
+      lower whisker=0.09964
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.05689,
+      upper quartile=0.05706,
+      lower quartile=0.05648,
+      upper whisker=0.05985,
+      lower whisker=0.05527
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=0.05564,
+      upper quartile=0.05560,
+      lower quartile=0.05552,
+      upper whisker=0.05985,
+      lower whisker=0.05382
+    },
+    ] coordinates {};
+  \end{axis}
+\end{tikzpicture}
+
+
+taille 10000
+\begin{tikzpicture}
+  \begin{axis}
+  [
+boxplot/draw direction
+=y,
+    xtick={1,2,3, 4},
+    xticklabels={Baseline, Plugin, Slang, Slang+JIT},
+    ]
+    \addplot+[
+    boxplot prepared={
+      median=10474,
+      upper quartile=10506,
+      lower quartile=10455,
+      upper whisker=11905,
+      lower whisker=10099
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=761,
+      upper quartile=761,
+      lower quartile=761,
+      upper whisker=765,
+      lower whisker=760
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=476.7,
+      upper quartile=477,
+      lower quartile=476,
+      upper whisker=482,
+      lower whisker=475
+    },
+    ] coordinates {};
+    \addplot+[
+    boxplot prepared={
+      median=500,
+      upper quartile=501.8,
+      lower quartile=500,
+      upper whisker=512,
+      lower whisker=499
+    },
+    ] coordinates {};
+  \end{axis}
+\end{tikzpicture}
+
+
 \cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
 4 string length. (1er <=3, dernier > 1000) 
 line 1: GCC
@@ -389,7 +558,7 @@ JSON
 
 \section{Discussion and related work}
 
-\cba{C'est un peu de la discussion dans le sens que le related work c'est que celui de Tim, le reste c'est plus des solutions pour le pb du stack switch, qui n'est pas le problème résolu dans ce papier}
+\cba{C'est un peu de la discussion dans le sens que le related work c'est que celui de Tim, le reste c'est plus des solutions pour le pb du stack switch, qui n'est pas le problï¿½me rï¿½solu dans ce papier}
 
 Work on reducing the number of prim
 
@@ -407,7 +576,7 @@ Self - Strongtalk -> tout en Smalltalk avec mature optimizing JIT. pb baseline p
  VisualWorks: baseline JIT but no interpreter => only 1 implement to write and maintain.
 
 
-\cba{Ajoute le related work que tu as trouvé de ICOOOLPS avec le travail de Tim.}
+\cba{Ajoute le related work que tu as trouvï¿½ de ICOOOLPS avec le travail de Tim.}
 
 \section{Future work and conclusion}
 1. number of representations\\
