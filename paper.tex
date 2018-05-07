@@ -348,12 +348,6 @@ Trade-off engineering time and performance.
 - recompiler la VM ou pas (Plugin externes, code Smalltalk)
 - complexite d'implem (comprehension Smalltalk, C, ASM)
 
-
-
-%%%%%
-% END OLD
-%%%%%
-
 \section{Evaluation}
 \label{sec:eval}
 
@@ -367,171 +361,189 @@ LLVM eval Mac OS X + machine spec.
 \subsection{Micro-benchmarks}
 Results on strings of different lengths (3, 10, 1000)
 
-taille 0
 
-\begin{tikzpicture}
-  \begin{axis}
-  [
-boxplot/draw direction
-=y,
-    xtick={1,2,3},
-    xticklabels={Plugin, Slang, Slang+JIT},
-    ]
-    \addplot+[
-    boxplot prepared={
-      median=2.942,
-      upper quartile=2.977,
-      lower quartile=2.911,
-      upper whisker=3.098,
-      lower whisker=2.797
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.9594,
-      upper quartile=0.9791,
-      lower quartile=0.9230,
-      upper whisker=1.1059,
-      lower whisker=0.8705
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.4258,
-      upper quartile=0.4310,
-      lower quartile=0.4227,
-      upper whisker=0.5181,
-      lower whisker=0.4074
-    },
-    ] coordinates {};
-  \end{axis}
-\end{tikzpicture}
+\cba{Personnellement je ferais une figure, ou tu places tes graphes dedans, et pares tu referes a la figure dans le texte.}
 
-taille 5
+\begin{figure*}
+  \centering
+  
+    \begin{subfigure}[b]{.45\textwidth}
+    
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction
+    =y,
+        xtick={1,2,3},
+        xticklabels={Plugin, Slang, Slang+JIT},
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=2.942,
+          upper quartile=2.977,
+          lower quartile=2.911,
+          upper whisker=3.098,
+          lower whisker=2.797
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.9594,
+          upper quartile=0.9791,
+          lower quartile=0.9230,
+          upper whisker=1.1059,
+          lower whisker=0.8705
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.4258,
+          upper quartile=0.4310,
+          lower quartile=0.4227,
+          upper whisker=0.5181,
+          lower whisker=0.4074
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
 
-\begin{tikzpicture}
-  \begin{axis}
-  [
-boxplot/draw direction=y,
-    xtick={1,2,3},
-    xticklabels={Plugin, Slang, Slang+JIT},
-    ]
-    \addplot+[
-    boxplot prepared={
-      median=0.6904,
-      upper quartile=0.6998,
-      lower quartile=0.6835,
-      upper whisker=0.7353,
-      lower whisker=0.6407
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.2530,
-      upper quartile=0.2594,
-      lower quartile=0.2449,
-      upper whisker=0.2836,
-      lower whisker=0.2323
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.1455,
-      upper quartile=0.1475,
-      lower quartile=0.1425,
-      upper whisker=0.1636,
-      lower whisker=0.1266
-    },
-    ] coordinates {};
-  \end{axis}
-\end{tikzpicture}
+    \subcaption{Taille 0}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
 
-taille 100
-\begin{tikzpicture}
-  \begin{axis}
-  [
-boxplot/draw direction=y,
-    xtick={1,2,3},
-    xticklabels={Plugin, Slang, Slang+JIT},
-    ]
-    \addplot+[
-    boxplot prepared={
-      median=0.10378,
-      upper quartile=0.10435,
-      lower quartile=0.10355,
-      upper whisker=0.10586,
-      lower whisker=0.09964
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.05689,
-      upper quartile=0.05706,
-      lower quartile=0.05648,
-      upper whisker=0.05985,
-      lower whisker=0.05527
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=0.05564,
-      upper quartile=0.05560,
-      lower quartile=0.05552,
-      upper whisker=0.05985,
-      lower whisker=0.05382
-    },
-    ] coordinates {};
-  \end{axis}
-\end{tikzpicture}
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction=y,
+        xtick={1,2,3},
+        xticklabels={Plugin, Slang, Slang+JIT},
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=0.6904,
+          upper quartile=0.6998,
+          lower quartile=0.6835,
+          upper whisker=0.7353,
+          lower whisker=0.6407
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.2530,
+          upper quartile=0.2594,
+          lower quartile=0.2449,
+          upper whisker=0.2836,
+          lower whisker=0.2323
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.1455,
+          upper quartile=0.1475,
+          lower quartile=0.1425,
+          upper whisker=0.1636,
+          lower whisker=0.1266
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
 
+    \subcaption{Taille 5}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
 
-taille 10000
-\begin{tikzpicture}
-  \begin{axis}
-  [
-boxplot/draw direction
-=y,
-    xtick={1,2,3, 4},
-    xticklabels={Baseline, Plugin, Slang, Slang+JIT},
-    ]
-    \addplot+[
-    boxplot prepared={
-      median=10474,
-      upper quartile=10506,
-      lower quartile=10455,
-      upper whisker=11905,
-      lower whisker=10099
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=761,
-      upper quartile=761,
-      lower quartile=761,
-      upper whisker=765,
-      lower whisker=760
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=476.7,
-      upper quartile=477,
-      lower quartile=476,
-      upper whisker=482,
-      lower whisker=475
-    },
-    ] coordinates {};
-    \addplot+[
-    boxplot prepared={
-      median=500,
-      upper quartile=501.8,
-      lower quartile=500,
-      upper whisker=512,
-      lower whisker=499
-    },
-    ] coordinates {};
-  \end{axis}
-\end{tikzpicture}
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction=y,
+        xtick={1,2,3},
+        xticklabels={Plugin, Slang, Slang+JIT},
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=0.10378,
+          upper quartile=0.10435,
+          lower quartile=0.10355,
+          upper whisker=0.10586,
+          lower whisker=0.09964
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.05689,
+          upper quartile=0.05706,
+          lower quartile=0.05648,
+          upper whisker=0.05985,
+          lower whisker=0.05527
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.05564,
+          upper quartile=0.05560,
+          lower quartile=0.05552,
+          upper whisker=0.05985,
+          lower whisker=0.05382
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+
+    \subcaption{Taille 100}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
+
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction
+    =y,
+        xtick={1,2,3, 4},
+        xticklabels={Baseline, Plugin, Slang, Slang+JIT},
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=10474,
+          upper quartile=10506,
+          lower quartile=10455,
+          upper whisker=11905,
+          lower whisker=10099
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=761,
+          upper quartile=761,
+          lower quartile=761,
+          upper whisker=765,
+          lower whisker=760
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=476.7,
+          upper quartile=477,
+          lower quartile=476,
+          upper whisker=482,
+          lower whisker=475
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=500,
+          upper quartile=501.8,
+          lower quartile=500,
+          upper whisker=512,
+          lower whisker=499
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+    
+   \subcaption{Taille 10000}
+   \end{subfigure}
+   \caption{GCC-Linux results}
+\end{figure*}
 
 
 \cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
