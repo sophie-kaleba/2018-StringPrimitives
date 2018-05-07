@@ -424,7 +424,7 @@ Results on strings of different lengths (3, 10, 1000)
       \end{axis}
     \end{tikzpicture}
 
-    \subcaption{Taille 0}
+    \subcaption{Size 0}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
 
@@ -484,7 +484,7 @@ Results on strings of different lengths (3, 10, 1000)
       \end{axis}
     \end{tikzpicture}
 
-    \subcaption{Taille 5}
+    \subcaption{Size 5}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
 
@@ -544,7 +544,7 @@ Results on strings of different lengths (3, 10, 1000)
       \end{axis}
     \end{tikzpicture}
 
-    \subcaption{Taille 100}
+    \subcaption{Size 100}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
 
@@ -605,9 +605,256 @@ Results on strings of different lengths (3, 10, 1000)
       \end{axis}
     \end{tikzpicture}
     
-   \subcaption{Taille 1000}
+   \subcaption{Size 1000}
    \end{subfigure}
    \caption{GCC-Linux results}
+\end{figure*}
+
+
+\begin{figure*}
+  \centering
+  
+    \begin{subfigure}[b]{.45\textwidth}
+    
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction
+    =y,
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.3162,
+          upper quartile=0.3179,
+          lower quartile=0.3072,
+          upper whisker=0.3720,
+          lower whisker=0.3022
+        },        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.3023,
+          upper quartile=0.3029,
+          lower quartile=0.3006,
+          upper whisker=0.3547,
+          lower whisker=0.2984
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.8538,
+          upper quartile=0.8591,
+          lower quartile=0.8482,
+          upper whisker=0.9920,
+          lower whisker=0.7516
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=2.142,
+          upper quartile=2.429,
+          lower quartile=2.120,
+          upper whisker=2.990,
+          lower whisker=2.038
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+
+    \subcaption{Size 0}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
+
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction=y,
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=1.261,
+          upper quartile=1.270,
+          lower quartile=1.227,
+          upper whisker=1.282,
+          lower whisker=1.205
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=1.229,
+          upper quartile=1.235,
+          lower quartile=1.227,
+          upper whisker=1.248,
+          lower whisker=1.203
+        },
+        ] coordinates {};
+                \addplot+[
+        boxplot prepared={
+          median=2.832,
+          upper quartile=2.847,
+          lower quartile=2.814,
+          upper whisker=2.875,
+          lower whisker=2.706
+        },
+        ] coordinates {};
+                \addplot+[
+        boxplot prepared={
+          median=7.094,
+          upper quartile=7.138,
+          lower quartile=7.057,
+          upper whisker=7.212,
+          lower whisker=6.854
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+
+    \subcaption{Size 5}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
+
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction=y,
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },
+        ] coordinates {};
+         \addplot+[
+        boxplot prepared={
+          median=6.746,
+          upper quartile=6.826,
+          lower quartile=6.622,
+          upper whisker=7.384,
+          lower whisker=5.307
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=6.581,
+          upper quartile=6.626,
+          lower quartile=6.553,
+          upper whisker=7.087,
+          lower whisker=6.362
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=10.330,
+          upper quartile=10.122,
+          lower quartile=10.461,
+          upper whisker=11.110,
+          lower whisker=9.246
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=18.08,
+          upper quartile=18.16,
+          lower quartile=17.79,
+          upper whisker=19.53,
+          lower whisker=16.36
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+
+    \subcaption{Size 100}
+    \end{subfigure}
+    \begin{subfigure}[b]{.45\textwidth}
+
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+    boxplot/draw direction
+    =y,
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
+        ]
+        \addplot+[
+        boxplot prepared={
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=9.485,
+          upper quartile=9.521,
+          lower quartile=9.314,
+          upper whisker=9.720,
+          lower whisker=8.831
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=9.212,
+          upper quartile=9.271,
+          lower quartile=9.173,
+          upper whisker=9.364,
+          lower whisker=8.979
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=13.48,
+          upper quartile=13.61,
+          lower quartile=13.33,
+          upper whisker=13.70,
+          lower whisker=12.81
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=26.54,
+          upper quartile=26.80,
+          lower quartile=26.07,
+          upper whisker=27.12,
+          lower whisker=25.53
+        },
+        ] coordinates {};
+      \end{axis}
+    \end{tikzpicture}
+    
+   \subcaption{Size 1000}
+   \end{subfigure}
+   \caption{LLVM-Mac results}
 \end{figure*}
 
 
