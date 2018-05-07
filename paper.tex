@@ -374,34 +374,51 @@ Results on strings of different lengths (3, 10, 1000)
       [
     boxplot/draw direction
     =y,
-        xtick={1,2,3},
-        xticklabels={Plugin, Slang, Slang+JIT},
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
         ]
         \addplot+[
         boxplot prepared={
-          median=2.942,
-          upper quartile=2.977,
-          lower quartile=2.911,
-          upper whisker=3.098,
-          lower whisker=2.797
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.3413,
+          upper quartile=0.3421,
+          lower quartile=0.3398,
+          upper whisker=0.3559,
+          lower whisker=0.3351
+        },        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=0.3399,
+          upper quartile=0.3409,
+          lower quartile=0.3393,
+          upper whisker=0.3569,
+          lower whisker=0.3140
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.9594,
-          upper quartile=0.9791,
-          lower quartile=0.9230,
-          upper whisker=1.1059,
-          lower whisker=0.8705
+          median=1.089,
+          upper quartile=1.090,
+          lower quartile=1.084,
+          upper whisker=1.143,
+          lower whisker=1.016
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.4258,
-          upper quartile=0.4310,
-          lower quartile=0.4227,
-          upper whisker=0.5181,
-          lower whisker=0.4074
+          median=2.486,
+          upper quartile=2.488,
+          lower quartile=2.483,
+          upper whisker=2.612,
+          lower whisker=2.477
         },
         ] coordinates {};
       \end{axis}
@@ -415,34 +432,53 @@ Results on strings of different lengths (3, 10, 1000)
       \begin{axis}
       [
     boxplot/draw direction=y,
-        xtick={1,2,3},
-        xticklabels={Plugin, Slang, Slang+JIT},
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
         ]
         \addplot+[
         boxplot prepared={
-          median=0.6904,
-          upper quartile=0.6998,
-          lower quartile=0.6835,
-          upper whisker=0.7353,
-          lower whisker=0.6407
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.2530,
-          upper quartile=0.2594,
-          lower quartile=0.2449,
-          upper whisker=0.2836,
-          lower whisker=0.2323
+          median=1.394,
+          upper quartile=1.396,
+          lower quartile=1.388,
+          upper whisker=1.416,
+          lower whisker=1.332
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.1455,
-          upper quartile=0.1475,
-          lower quartile=0.1425,
-          upper whisker=0.1636,
-          lower whisker=0.1266
+          median=1.361,
+          upper quartile=1.366,
+          lower quartile=1.358,
+          upper whisker=1.380,
+          lower whisker=1.007
+        },
+        ] coordinates {};
+                \addplot+[
+        boxplot prepared={
+          median=3.887,
+          upper quartile=3.887,
+          lower quartile=3.884,
+          upper whisker=3.942,
+          lower whisker=2.294
+        },
+        ] coordinates {};
+                \addplot+[
+        boxplot prepared={
+          median=6.716,
+          upper quartile=6.744,
+          lower quartile=6.712,
+          upper whisker=6.970,
+          lower whisker=6.676
         },
         ] coordinates {};
       \end{axis}
@@ -456,34 +492,53 @@ Results on strings of different lengths (3, 10, 1000)
       \begin{axis}
       [
     boxplot/draw direction=y,
-        xtick={1,2,3},
-        xticklabels={Plugin, Slang, Slang+JIT},
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
         ]
         \addplot+[
         boxplot prepared={
-          median=0.10378,
-          upper quartile=0.10435,
-          lower quartile=0.10355,
-          upper whisker=0.10586,
-          lower whisker=0.09964
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
+        },
+        ] coordinates {};
+         \addplot+[
+        boxplot prepared={
+          median=8.569,
+          upper quartile=8.602,
+          lower quartile=8.562,
+          upper whisker=9.671,
+          lower whisker=8.510
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.05689,
-          upper quartile=0.05706,
-          lower quartile=0.05648,
-          upper whisker=0.05985,
-          lower whisker=0.05527
+          median=8.938,
+          upper quartile=8.967,
+          lower quartile=8.935,
+          upper whisker=10.022,
+          lower whisker=6.044
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=0.05564,
-          upper quartile=0.05560,
-          lower quartile=0.05552,
-          upper whisker=0.05985,
-          lower whisker=0.05382
+          median=16.22,
+          upper quartile=16.24,
+          lower quartile=16.21,
+          upper whisker=18.20,
+          lower whisker=10.40
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=16.66,
+          upper quartile=16.68,
+          lower quartile=16.44,
+          upper whisker=18.44,
+          lower whisker=16.43
         },
         ] coordinates {};
       \end{axis}
@@ -498,49 +553,59 @@ Results on strings of different lengths (3, 10, 1000)
       [
     boxplot/draw direction
     =y,
-        xtick={1,2,3, 4},
-        xticklabels={Baseline, Plugin, Slang, Slang+JIT},
+        xtick={1,2,3,4,5},
+        xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
+        font={\tiny}
         ]
         \addplot+[
         boxplot prepared={
-          median=10474,
-          upper quartile=10506,
-          lower quartile=10455,
-          upper whisker=11905,
-          lower whisker=10099
+          median=1,
+          upper quartile=1,
+          lower quartile=1,
+          upper whisker=1,
+          lower whisker=1
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=761,
-          upper quartile=761,
-          lower quartile=761,
-          upper whisker=765,
-          lower whisker=760
+          median=13.50,
+          upper quartile=13.55,
+          lower quartile=13.46,
+          upper whisker=14.42,
+          lower whisker=12.90
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=476.7,
-          upper quartile=477,
-          lower quartile=476,
-          upper whisker=482,
-          lower whisker=475
+          median=14.76,
+          upper quartile=14.82,
+          lower quartile=14.76,
+          upper whisker=15.71,
+          lower whisker=10.83
         },
         ] coordinates {};
         \addplot+[
         boxplot prepared={
-          median=500,
-          upper quartile=501.8,
-          lower quartile=500,
-          upper whisker=512,
-          lower whisker=499
+          median=24.39,
+          upper quartile=24.41,
+          lower quartile=24.26,
+          upper whisker=25.98,
+          lower whisker=19.77
+        },
+        ] coordinates {};
+        \addplot+[
+        boxplot prepared={
+          median=24.25,
+          upper quartile=24.30,
+          lower quartile=24.25,
+          upper whisker=25.82,
+          lower whisker=24.08
         },
         ] coordinates {};
       \end{axis}
     \end{tikzpicture}
     
-   \subcaption{Taille 10000}
+   \subcaption{Taille 1000}
    \end{subfigure}
    \caption{GCC-Linux results}
 \end{figure*}
