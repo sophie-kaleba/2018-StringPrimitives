@@ -121,18 +121,16 @@
 }
 \email{stephane.ducasse@inria.fr}         %% \email is recommended
 
-
 %% Abstract
 %% Note: \begin{abstract}...\end{abstract} environment must come
 %% before \maketitle command
 \begin{abstract}
 
-Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional, they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
+Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional: they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
 
-In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++) or on top of the just-in-time compiler back-end. We implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine. 
+In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++), or on top of the just-in-time compiler back-end. This raises the questions of the tradeoffs of the different alternatives. We implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine. 
 
-The paper shows that the implementation with the most reliable and high performance is also the most complex and difficult to implement. Since hundreds of optional primitives can be available, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
-
+Without surprise, the paper shows that the implementation with the most reliable and high performance is also the most complex and difficult to implement. Since hundreds of optional primitives could be wished, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
 \end{abstract}
 
 %% 2012 ACM Computing Classification System (CSS) concepts
@@ -172,7 +170,7 @@ The paper shows that the implementation with the most reliable and high performa
 \section{Introduction}
 \label{sec:intro}
 
-High level object oriented programming languages are often implemented on top of a virtual machine (VM). As VMs has become more popular, different techniques have been set-up using Just-In-Time (JIT) compilation to improve the overall performance of the runtime such as method JITs \cite{ursPHD} which usually compile methods to native code and tracing JITs \cite{Dynamo, PyPyTracing} which usually compile linear traces of execution into native code. 
+High-level object-oriented programming languages are often implemented on top of a virtual machine (VM). As VMs has become more popular, different techniques have been set-up using Just-In-Time (JIT) compilation to improve the overall performance of the runtime such as method JITs \cite{ursPHD} which usually compile methods to native code and tracing JITs \cite{Dynamo, PyPyTracing} which usually compile linear traces of execution into native code. 
 
 On top of its virtual machine, the client language can use a set of \emph{primitives}~\footnote{We use in the paper the Smalltalk terminology (primitive) as this is the programming language used for our evaluation. Some other programming languages, such as Javascript, prefer to use the term built-in instead of primitive.}, which are performed directly by the interpreter rather than by evaluating expressions in a method. We distinguish two kinds of primitives:
 \begin{itemize}
@@ -221,6 +219,8 @@ Most of the Cog VM code base is written in Slang, a subset of Smalltalk. Slang i
 
 The executable is generated in two steps as shown on Figure \ref{fig:VMCompilation}, similarly to the RPython toolchain \cite{RPythonToolchain}. The first step is to generate the two C files representing the whole execution engine written in Slang using the Slang-to-C compiler. During the second step, a C compiler is called to compile the execution engine and the platform-specific code written directly in C to the executable VM.
 
+\cba{We need to introduce here the concept of VM plugin and interpreterproxy indirection/overhead. This is very important since later we just say this is a plugin and we don't redefine it}
+
 \subsection{VM execution}
 \label{sec:VMexec}
 
@@ -267,6 +267,8 @@ To fail without side-effects a primitive must validate any parameters and any st
  
 \paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative integer, zero, or a positive integer as the first parameter is less than, equal to, or greater than the second parameter.
 
+In the paper we will focus on the comparison of two strings with the default ASCII ordering and measure the performance only of this case. The goal of this work was to improve the performance of common string operations, typically string equality which internally use the primitive, and the cases where the order is non ASCII are uncommon. 
+
 \section{Different primitive implementations}
 \label{sec:implem}
  
@@ -275,45 +277,25 @@ To fail without side-effects a primitive must validate any parameters and any st
  \subsection{Different implementations and executions}
  
 \paragraph{Baseline: pure Smalltalk.}
-\cba{Hum I believed that one should follow new specification and not old one ? With neg, 0 or pos value ?}
-: baseline
-Smalltalk code on top of VM. Used as our baseline for benchmarks.
+To evaluate the primitive performance, we use as baseline an implementation in pure Smalltalk. There are multiple ways of writing the comparison of two strings in Smalltalk, following Smalltalk coding conventions, a standard developer would likely use high-level constructs which apply a closure on each element of the strings. We did not use high-level construct and chose to implement the Smalltalk version the most optimized way Smalltalk allows, \emph{i.e.,} we used the contructs to:do: and ifFalse:, which are both recognized by the Smalltalk to bytecode compiler and compiled respectively to loops and branches at the bytecode level. The implementation follows the new specification, hence two methods are available, baselineCompareWith: and baselineCompareWith:order:. Since the focus is only on ASCII ordered comparison, we show the code only of baselineCompareWith:.
 
 \begin{code}
-compareWithPureST: aString 
-	
+baselineCompareWith: aString 
 	| c1 c2 length1 length2 |
 	length1 := self size.
 	length2 := aString size.
-		1 to: (length1 min: length2) do: [ :i |
-			(c1 := self basicAt: i) = (c2 := aString basicAt: i) 
-			ifFalse: [
-				c1 < c2
-					ifTrue: [ ^1 ]
-					ifFalse: [ ^3 ] ] ].
-		length1 = length2 ifTrue: [ ^2 ].
-		length1 < length2
-			ifTrue: [ ^1 ]
-			ifFalse: [ ^3 ] 
+	1 to: (length1 min: length2) do: [ :i |
+		(c1 := self basicAt: i) = (c2 := aString basicAt: i) ifFalse: [ ^ c1 - c2 ] ].
+	^ length1 - length2
 \end{code}
 
-Expliquer to:do: over do: (to explain expresiveness) => core lib often use to:do: and not do:
-New spec
-
 \paragraph{Existing: Smart Syntax Plugin.}
-Restricted Smalltalk
 
-written in Smalltalk with restrictions.
-Compiled to C AOT into a plugin.
-Write once, fall-back + compiled.
-
-old spec
+The Smart Syntax Plugin is one of the version existing until we started this work. The idea behind Smart Syntax was the following: the programmer can write code in Smalltalk using exclusively constructs that are recognized by the Smart Syntax compiler and that can be directly compiled to C (computing the size of a byte array, accessing its fields and doing integer arithmetic for example). With the addition of type annotations in the form of pragmas \cite{Duca16a} \footnote{Pragma are a form of method annotation.}, the Smart Syntax plugin was able to generate C code from the Smalltalk code. With this approach, the programmer has to write the optional primitive code a single time in Smalltalk. This code is used both as the fall-back code if the VM does not implement the primitive and at Slang to C compilation time to generate a C plugin from the code and the type annotations. This primitive follows the old specification.
 
 \paragraph{Existing: Slang Plugin.}
-Slang, but no access au fonctions de la VM drectement.
- interpreterProxy. (C compiler inlining, linking time ? cmacro ?)
- 
- old spec
+
+The Slang plugin is a recent complete rewrite of the Smart Syntax plugin. The main difference is that the Smalltalk version is used only as fall-back code, while at Slang to C compilation time the VM uses code written in Slang to generate the C code. One of the side-effect is that the plugin's code is now part of the VM code base and not the client code bases, which is convenient for maintenance since the Cog VM has multiple client languages. However, the implementor now needs to maintain and evolve two version of the primitive, the fall-back code in Smalltalk and the code in Slang. This primitive follows the old specification.
 
 \paragraph{Pure Slang.}
 
@@ -366,7 +348,7 @@ Control on generated code => difference LLVM/GCC
 \label{tab:cmp_implem}
 \end{table}
 
-One or the other implementation could be chosen over another one, depending on what one's aiming at: the main trade-off will be between the engineering time and the performance. The table \ref{cmp_implem} summarizes the main pros and cons related to each implementation
+One or the other implementation could be chosen over another one, depending on what one's aiming at: the main trade-off will be between the engineering time and the performance. The table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation
 
 
 
@@ -786,7 +768,7 @@ the performance gap between this implementation and the PureSlang one tends to d
 
 However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{gcc} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
-This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
+This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
 \sk{parler des autres optis qui n'ont pas d'impact négatif sur le temps d'exec ? ou le conserver pour les future work pour des potentielles améliorations?}
 
@@ -850,7 +832,7 @@ Conclusion: trade off expressiveness performance
 
 
 %% Bibliography
-\bibliography{sista}
+\bibliography{sista,rmod}
 
 
 %% Appendix
