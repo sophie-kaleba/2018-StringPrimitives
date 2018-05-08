@@ -295,25 +295,20 @@ baselineCompareWith: aString
 
 \paragraph{Existing: Smart Syntax Plugin.}
 
-The Smart Syntax Plugin is one of the version existing until we started this work. The idea behind Smart Syntax was the following: the programmer can write code in Smalltalk using exclusively constructs that are recognized by the Smart Syntax compiler and that can be directly compiled to C (computing the size of a byte array, accessing its fields and doing integer arithmetic for example). With the addition of type annotations in the form of pragmas \cite{Duca16a} \footnote{Pragma are a form of method annotation.}, the Smart Syntax plugin was able to generate C code from the Smalltalk code. With this approach, the programmer has to write the optional primitive code a single time in Smalltalk. This code is used both as the fall-back code if the VM does not implement the primitive and at Slang to C compilation time to generate a C plugin from the code and the type annotations. This primitive follows the old specification.
+The Smart Syntax Plugin is one of the version existing until we started this work. The idea behind Smart Syntax was the following: the programmer can write code in Smalltalk using exclusively constructs that are recognized by the Smart Syntax compiler and that can be directly compiled to C (computing the size of a byte array, accessing its fields and doing integer arithmetic for example). With the addition of type annotations in the form of pragmas \cite{Duca16a} \footnote{Pragma are a form of method annotation.}, the Smart Syntax plugin was able to generate C code from the Smalltalk code. With this approach, the programmer has to write the optional primitive code a single time in Smalltalk. This code is used both as the fall-back code if the VM does not implement the primitive and at Slang to C compilation time to generate a C plugin from the code and the type annotations. This primitive follows the old specification, the full code is available in Appendix \ref{SmartSyntaxAppendix}.
 
 \paragraph{Existing: Slang Plugin.}
 
-The Slang plugin is a recent complete rewrite of the Smart Syntax plugin. The main difference is that the Smalltalk version is used only as fall-back code, while at Slang to C compilation time the VM uses code written in Slang to generate the C code. One of the side-effect is that the plugin's code is now part of the VM code base and not the client code bases, which is convenient for maintenance since the Cog VM has multiple client languages. However, the implementor now needs to maintain and evolve two version of the primitive, the fall-back code in Smalltalk and the code in Slang. This primitive follows the old specification.
+The Slang plugin is a recent complete rewrite of the Smart Syntax plugin. The main difference is that the Smalltalk version is used only as fall-back code, while at Slang to C compilation time the VM uses code written in Slang to generate the C code. One of the side-effect is that the plugin's code is now part of the VM code base and not the client code bases, which is convenient for maintenance since the Cog VM has multiple client languages. However, the implementor now needs to maintain and evolve two version of the primitive, the fall-back code in Smalltalk and the code in Slang. This primitive follows the old specification, the full code is available in Appendix \ref{PluginAppendix}.
 
 \paragraph{Pure Slang.}
 
-new spec
+The Slang implementation is written inside the interpreter and has access to all interpreter APIs. Since the same primitive index \cba{Concept to introduce before or rephrase} is used for the primitive with 2 or 3 arguments, the primitive needs to deal with both cases in a way that the common case is efficient. The primitive is now part of the core of the VM, it cannot be easily added or removed as plugin primitives, but it is simpler to read and write. This primitive follows the new specification, the full code is available in Appendix \ref{SlangAppendix}.
 
 \paragraph{Pure Slang with JIT support.}
-Cog RTL
 
-generate functions as machine code
-partial implementation (frequent cases are implemented)
-Sometimes, fallback to less-optimised version
+In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is greater, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator. Since only performance critical implementations matter in this context, we've re-implemented only the case where there is 2 parameters. For the three parameter primitive, the VM falls-back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
-new spec
- 
  \subsection{Pros and cons}
  
   Can be changed like Smalltalk code (No C compilation whatsoever). Readability. Only impl without VM recompilation.
@@ -848,20 +843,39 @@ Conclusion: trade off expressiveness performance
 \section{Smart Syntax code}
 \label{SmartSyntaxAppendix}
 
+\begin{code}
+compare: string1 with: string2 collated: order	"Return 1, 2 or 3, if string1 is <, =, or > string2, with the collating order of characters given by the order array."	| len1 len2 c1 c2 |	<primitive: 'primitiveCompareString' module: 'MiscPrimitivePlugin'>	<var: #string1 declareC: 'unsigned char *string1'>	<var: #string2 declareC: 'unsigned char *string2'>	<var: #order declareC: 'unsigned char *order'>	len1 := string1 size.	len2 := string2 size.	1 to: (len1 min: len2) do:		[:i |		c1 := order at: (string1 basicAt: i) + 1.		c2 := order at: (string2 basicAt: i) + 1.		c1 = c2 ifFalse: 			[c1 < c2 ifTrue: [^ 1] ifFalse: [^ 3]]].	len1 = len2 ifTrue: [^ 2].	len1 < len2 ifTrue: [^ 1] ifFalse: [^ 3].
+\end{code}
+
 \cba{Source code et generated C code et generated ASM code}
 
 \section{Slang Plugin code}
-\label{SmartSyntaxAppendix}
+\label{PluginAppendix}
+
+\begin{code}
+primitiveCompareString	"ByteString (class) compare: string1 with: string2 collated: order"	<export: true>	| len1 len2 order string1 string2 |	<var: 'order' type: #'unsigned char *'>	<var: 'string1' type: #'unsigned char *'>	<var: 'string2' type: #'unsigned char *'>	((interpreterProxy isBytes: (interpreterProxy stackValue: 0))	and: [(interpreterProxy isBytes: (interpreterProxy stackValue: 1))	and: [interpreterProxy isBytes: (interpreterProxy stackValue: 2)]]) ifFalse:		[^interpreterProxy primitiveFailFor: PrimErrBadArgument].	string1 := interpreterProxy firstIndexableField: (interpreterProxy stackValue: 2).	string2 := interpreterProxy firstIndexableField: (interpreterProxy stackValue: 1).	order := interpreterProxy firstIndexableField: (interpreterProxy stackValue: 0).	len1 := interpreterProxy sizeOfSTArrayFromCPrimitive: string1.	len2 := interpreterProxy sizeOfSTArrayFromCPrimitive: string2.	(interpreterProxy sizeOfSTArrayFromCPrimitive: order) < 256 ifTrue:		[^interpreterProxy primitiveFailFor: PrimErrBadArgument].	0 to: (len1 min: len2) - 1 do: 		[ :i | | c1 c2 |		c1 := order at: (string1 at: i).		c2 := order at: (string2 at: i).		c1 = c2 ifFalse:			[^interpreterProxy methodReturnInteger: (c1 < c2 ifTrue: [1] ifFalse: [3])]].	interpreterProxy methodReturnInteger:		(len1 = len2 ifTrue: [2] ifFalse: [len1 < len2 ifTrue: [1] ifFalse: [3]])
+\end{code}
 
 \cba{Source code et generated C code et generated ASM code}
 
 \section{Slang code}
 \label{SlangAppendix}
 
+\begin{code}
+primitiveCompareWith	"<string1> primitiveCompareWith: string2 [collated: order] "	<export: true>		| string1 string2 order strLength1 strLength2 result |	"1 - fetch the parameters from the stack"		argumentCount = 1 ifFalse:		[argumentCount ~= 2 ifTrue:			[^self primitiveFailFor: PrimErrBadNumArgs].			 order := self stackTop.			 ((objectMemory isBytes: order)			 and: [(objectMemory numBytesOfBytes: order) = 256]) ifFalse:				[^self primitiveFailFor: PrimErrBadArgument]].	string1 := self stackValue: argumentCount.	string2 := self stackValue: argumentCount - 1. 			"2 - check their types - all parameters are ByteObject"	((objectMemory isBytes: string1)	 and: [objectMemory isBytes: string2]) ifFalse: 		[^self primitiveFailFor: PrimErrBadArgument].	"3 - compare the strings"		strLength1 := objectMemory numBytesOfBytes: string1.	strLength2 := objectMemory numBytesOfBytes: string2.	result := order 		ifNil: [self rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock:				[:str :index | objectMemory fetchByte: index ofObject: str ]]		ifNotNil: 			[self rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock:				[:str :index | objectMemory fetchByte: (objectMemory fetchByte: index ofObject: str) + 1 ofObject: order ]].	self methodReturnInteger: result
+\end{code}
+\begin{code}
+rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock: accessBlock	| c1 c2 min |	<inline: true> "needs to be forced else slang does not inline it by default"	min := strLength1 min: strLength2.	0 to: min-1 do: 		[:i | c1 := accessBlock value: string1 value: i.			c2 := accessBlock value: string2 value: i.			c1 = c2 ifFalse: [^c1 - c2]].	^strLength1 - strLength2
+\end{code}
+
 \cba{Source code et generated C code et generated ASM code}
 
 \section{Cog's RTL code}
 \label{RTLAppendix}
+
+\begin{code}
+genPrimitiveStringCompareWith	| instr jump jumpAbove jumpIncorrectFormat1 jumpIncorrectFormat2 jumpIncorrectFormat3 jumpIncorrectFormat4 jumpMidFailure jumpSuccess minSizeReg string1CharOrByteSizeReg string2CharOrByteSizeReg string1Reg string2Reg |	<var: #jumpIncorrectFormat1 type: #'AbstractInstruction *'>	<var: #jumpIncorrectFormat2 type: #'AbstractInstruction *'>	<var: #jumpIncorrectFormat3 type: #'AbstractInstruction *'>	<var: #jumpIncorrectFormat4 type: #'AbstractInstruction *'>	<var: #jumpAbove type: #'AbstractInstruction *'>	<var: #jumpSuccess type: #'AbstractInstruction *'>	<var: #jump type: #'AbstractInstruction *'>	<var: #jumpMidFailure type: #'AbstractInstruction *'>	"I redefine those name to ease program comprehension"	string1Reg := ReceiverResultReg.	string2Reg := Arg0Reg.	string1CharOrByteSizeReg := Arg1Reg.	string2CharOrByteSizeReg := ClassReg.	minSizeReg := SendNumArgsReg.	"Load arguments in reg"	cogit genLoadArgAtDepth: 0 into: string2Reg.	"checks if string1 is a byteobject and get its size in bytes"	self genGetFormatOf: string1Reg into: TempReg.	cogit CmpCq: objectMemory firstByteFormat R: TempReg.	jumpIncorrectFormat1 := cogit JumpLess: 0.	cogit CmpCq: objectMemory firstCompiledMethodFormat R: TempReg.	jumpIncorrectFormat2 := cogit JumpAboveOrEqual: 0.		self genGetNumSlotsOf: string1Reg into: string1CharOrByteSizeReg.	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string1CharOrByteSizeReg). 	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg. 	cogit SubR: TempReg R: string1CharOrByteSizeReg. 	"checks if string2 is a byteobject and get its size in bytes"	self genGetFormatOf: string2Reg into: TempReg.	cogit CmpCq: objectMemory firstByteFormat R: TempReg.	jumpIncorrectFormat3 := cogit JumpLess: 0.	cogit CmpCq: objectMemory firstCompiledMethodFormat R: TempReg.	jumpIncorrectFormat4 := cogit JumpAboveOrEqual: 0.		self genGetNumSlotsOf: string2Reg into: string2CharOrByteSizeReg.	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string2CharOrByteSizeReg).	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg.	cogit SubR: TempReg R: string2CharOrByteSizeReg.	"Type and number of arguments are correct"	"Compute the min"	 	cogit CmpR: string1CharOrByteSizeReg R: string2CharOrByteSizeReg.	jumpAbove := cogit JumpBelow: 0. 	cogit MoveR: string1CharOrByteSizeReg R: minSizeReg. 	jump := cogit Jump: 0. 	jumpAbove jmpTarget: (cogit MoveR: string2CharOrByteSizeReg R: minSizeReg). 	jump jmpTarget: (cogit CmpCq: 0 R: minSizeReg). 	jumpSuccess := cogit JumpZero: 0. "if one of the string is empty, no need to go through the comparing loop"	"Compare the bytes"	cogit MoveCq: objectMemory baseHeaderSize  R: TempReg.	cogit AddCq: objectMemory baseHeaderSize R: minSizeReg.	instr := cogit MoveXbr: TempReg R: string1Reg R: string1CharOrByteSizeReg.	cogit MoveXbr: TempReg R: string2Reg R: string2CharOrByteSizeReg.	cogit SubR: string2CharOrByteSizeReg R: string1CharOrByteSizeReg. 	jumpMidFailure := cogit JumpNonZero: 0. "the 2 compared characters are different, exit the loop"	cogit AddCq: 1 R: TempReg.	cogit CmpR: TempReg R: minSizeReg. 	cogit JumpNonZero: instr.	"all bytes from 1 to minSize are equal"	self genGetNumBytesOf: string1Reg into: string1CharOrByteSizeReg.	self genGetNumBytesOf: string2Reg into: string2CharOrByteSizeReg.	jumpSuccess jmpTarget: (cogit SubR: string2CharOrByteSizeReg R: string1CharOrByteSizeReg).	jumpMidFailure  jmpTarget: (cogit MoveR: string1CharOrByteSizeReg R: ReceiverResultReg).		self genConvertIntegerToSmallIntegerInReg: ReceiverResultReg.	cogit genPrimReturn.	jumpIncorrectFormat4 		jmpTarget: (jumpIncorrectFormat3 			jmpTarget: (jumpIncorrectFormat2 				jmpTarget: (jumpIncorrectFormat1 jmpTarget: cogit Label))).	^ CompletePrimitive
+\end{code}
 
 \cba{Source code et generated ASM code}
 
