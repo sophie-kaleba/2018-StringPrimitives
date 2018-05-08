@@ -127,12 +127,11 @@
 %% before \maketitle command
 \begin{abstract}
 
-Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional, they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
+Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional: they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
 
-In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++) or on top of the just-in-time compiler back-end. We implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine. 
+In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++), or on top of the just-in-time compiler back-end. This raises the questions of the tradeoffs of the different alternatives. We implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine. 
 
-The paper shows that the implementation with the most reliable and high performance is also the most complex and difficult to implement. Since hundreds of optional primitives can be available, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
-
+Without surprise, the paper shows that the implementation with the most reliable and high performance is also the most complex and difficult to implement. Since hundreds of optional primitives could be wished, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
 \end{abstract}
 
 %% 2012 ACM Computing Classification System (CSS) concepts
@@ -172,7 +171,7 @@ The paper shows that the implementation with the most reliable and high performa
 \section{Introduction}
 \label{sec:intro}
 
-High level object oriented programming languages are often implemented on top of a virtual machine (VM). As VMs has become more popular, different techniques have been set-up using Just-In-Time (JIT) compilation to improve the overall performance of the runtime such as method JITs \cite{ursPHD} which usually compile methods to native code and tracing JITs \cite{Dynamo, PyPyTracing} which usually compile linear traces of execution into native code. 
+High-level object-oriented programming languages are often implemented on top of a virtual machine (VM). As VMs has become more popular, different techniques have been set-up using Just-In-Time (JIT) compilation to improve the overall performance of the runtime such as method JITs \cite{ursPHD} which usually compile methods to native code and tracing JITs \cite{Dynamo, PyPyTracing} which usually compile linear traces of execution into native code. 
 
 On top of its virtual machine, the client language can use a set of \emph{primitives}~\footnote{We use in the paper the Smalltalk terminology (primitive) as this is the programming language used for our evaluation. Some other programming languages, such as Javascript, prefer to use the term built-in instead of primitive.}, which are performed directly by the interpreter rather than by evaluating expressions in a method. We distinguish two kinds of primitives:
 \begin{itemize}
