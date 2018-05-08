@@ -266,7 +266,7 @@ To fail without side-effects a primitive must validate any parameters and any st
 \end{itemize} 
  
 \paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative value if the first parameter is smaller than the second, 0 if they are equal, and a positive value if the first parameter is greater than the second one.
-\cba{Maybe rewrite the last paragraph to make it clearer / more formal. - CF Java spec ?}
+\cba{Maybe rewrite the last paragraph to make it clearer / more formal. - CF Java spec ? => This is critical, maybe in bold or in a box}
 
 \section{Different primitive implementations}
 \label{sec:implem}
@@ -797,8 +797,7 @@ This difference is mainly due to the optimizations performed by both the compile
 		\label{fig:Asm}
 \end{figure}
 
-    
-\cba{appendix with full code}
+\cba{I think in the fig we should also see the ASM cog generate}
 
 \subsection{Macro-benchmarks}
 Intro sentence with ref to squeak speed center.
