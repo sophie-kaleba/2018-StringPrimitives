@@ -224,6 +224,14 @@ Most of the Cog VM code base is written in Slang, a subset of Smalltalk. Slang i
 The executable is generated in two steps as shown on Figure~\ref{fig:VMCompilation}, similarly to the RPython toolchain \cite{RPythonToolchain}. The first step is to generate the two C files representing the whole execution engine written in Slang using the Slang-to-C compiler. During the second step, a C compiler is called to compile the execution engine and the platform-specific code written directly in C to the executable VM.
 
 \cba{We need to introduce here the concept of VM plugin and interpreterproxy indirection/overhead. This is very important since later we just say this is a plugin and we don't redefine it}
+\sk{done but someone better check what I wrote :-)}
+
+VM plugins enable the addition of new features to the VM. There are 2 types of plugins: the built-ins and the externals. 
+\begin{itemize}
+\item External plugins. Plugins that can be added or removed from the VM without the need to recompile the VM sources.
+\item Built-in plugins. Plugins that cannot be installed without recompiling the VM sources. However, these plugins can reach some parts of the VM internals\footnote{as data structures, routines...} that remains unreachable from an external plugin. These operations are performed via an InterpreterProxy. Although, this solution results in a substential overhead if called often.
+\end{itemize}
+
 
 \subsection{VM execution}
 \label{sec:VMexec}
