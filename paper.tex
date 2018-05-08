@@ -252,6 +252,8 @@ In the Cog VM, primitives are always associated with compiled methods. A compile
 
 To fail without side-effects a primitive must validate any parameters and any state fetched from them, before changing execution state by performing its operations. Validation involves any of testing for a specific class, testing for bit vs pointer objects, bounds checks, and recursively applying these tests to substructure of the parameters. For example, the primitive that installs a cursor examines the first parameter to check that it represents a valid cursor object, comprised of two bitmaps, one for the image and one for the shape, plus a point to specify the cursor's hotspot.
 
+The primitives can be associated either with a name, either with an index in the Cog VM. The named primitives can be added and modified without the need to recompile the VM.
+
 \subsection{String comparison primitive}
 \label{subsec:primSpec}
 
@@ -303,7 +305,7 @@ The Slang plugin is a recent complete rewrite of the Smart Syntax plugin. The ma
 
 \paragraph{Pure Slang.}
 
-The Slang implementation is written inside the interpreter and has access to all interpreter APIs. Since the same primitive index \cba{Concept to introduce before or rephrase} is used for the primitive with 2 or 3 arguments, the primitive needs to deal with both cases in a way that the common case is efficient. The primitive is now part of the core of the VM, it cannot be easily added or removed as plugin primitives, but it is simpler to read and write. This primitive follows the new specification, the full code is available in Appendix \ref{SlangAppendix}.
+The Slang implementation is written inside the interpreter and has access to all interpreter APIs. Since the same primitive index is used for the primitive with 2 or 3 arguments, the primitive needs to deal with both cases in a way that the common case is efficient. The primitive is now part of the core of the VM, it cannot be easily added or removed as plugin primitives, but it is simpler to read and write. This primitive follows the new specification, the full code is available in Appendix \ref{SlangAppendix}.
 
 \paragraph{Pure Slang with JIT support.}
 
