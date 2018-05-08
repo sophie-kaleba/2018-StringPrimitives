@@ -403,9 +403,9 @@ LLVM eval Mac OS X + machine spec.
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
-		%xbar width=0.30,
+		xbar width=0.30,
 		no markers,Baseline/.style={red},2/.style={green},3/.style={blue}
 		%cycle list={red, orange, green, purple, black}
         ]
@@ -440,9 +440,9 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -473,10 +473,10 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
 		ymin=0,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -508,10 +508,10 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
 		ymin=0,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -551,10 +551,10 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
 		ymin=0,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -586,9 +586,9 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -618,10 +618,10 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
 		ymin=0,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -652,10 +652,10 @@ x   y           error
         xtick={1,...,5},
         xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
         %x tick label as interval,
-        font={\footnotesize},
+        font={\tiny},
 		ybar=10pt,
 		ymin=0,
-		%xbar width=0.30
+		xbar width=0.30
         ]
 \addplot[
     fill=black!25,
@@ -690,45 +690,24 @@ We performed the benchmarks upon 4 different string sizes: 0, 5, 100 and 1000 ch
 The results are shown in terms of relative speed-up towards the baseline implementation, i.e. the pure smalltalk version. 
 We can notice some patterns over the results in figures \ref{fig:gcc} and \ref{fig:llvm}:
 \begin{itemize}
-\item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in \sk{faire ref à la partie}.
-\item The Slang+JIT implementation is more performant in every case. Nevertheless, 
+\item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in Section \ref{sec:VMexec}.
+\item The Slang+JIT implementation is more efficient in every case. Nevertheless, 
 the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop \sk{ref to appendix}
 \end{itemize} proves to be more and more time-consuming because of the higher number of iterations.
 
 
-Howerver, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{gcc} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factor for a 1000-characters string. They still greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factor.
+However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{gcc} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
-%\begin{lstlisting}[language={[x64]Assembler}]
-%movzbl 0x8(%eax,%edx,1),%ebp
-%movzbl 0x8(%eax,%ebx,1),%ecx
-%cmp    %ecx,%ebp
-%jne    6e8 <primitiveCompareWith+0x1f8>
-%add    $0x1,%eax
-%cmp    %eax,%edi
-%jne    610 <primitiveCompareWith+0x120> 
-%\end{lstlisting}
+This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
 
-\begin{table}
-\centering
-\begin{tabular}{|r|l|}
-  \hline
-   GCC & LLVM  \\
-  \hline
-  `movzbl 0x8(\%eax,\%edx,1),\%ebp` & `movl -0x14(\%ebp), \%esi`  \\
-  movzbl 0x8(\%eax,\%ebx,1),\%ecx & movzbl 0x8(\%edx,\%esi), \%esi \\
-  cmp    \%ecx,\%ebp & movl -0x18(\%ebp), \%edi \\
-  jne    0x8558 &  movzbl 0x8(\%edx,\%edi), \%edi \\
-  add    \$0x1,\%eax & subl \%edi, \%esi \\
-  cmp    \%eax,\%edi &  jne 0x1f660 \\
-  jne    0x8480 & incl \%edx \\
-   & cmpl \%ebx, \%edx \\
-   & jl 0x1f644 \\
-  \hline
-\end{tabular}
-\caption{Different compilers optimizations: GCC and LLVM}
-\label{tab:cmp_asm}
-\end{table}
+\begin{figure}[htp!]
+		\centering
+		\includegraphics[width=0.99\linewidth]{figures/cmpasm.png}
+		\caption{GCC and LLVM: different optimizations on the comparison loop}
+		\label{fig:Asm}
+\end{figure}
+
     
 \cba{Show ASM loops and discuss the differences
 add appendix with full code}
