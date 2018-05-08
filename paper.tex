@@ -364,6 +364,7 @@ Results on strings of different lengths (3, 10, 1000)
 
 \cba{Personnellement je ferais une figure, ou tu places tes graphes dedans, et pares tu referes a la figure dans le texte.}
 
+
 \begin{figure*}
   \centering
   
@@ -372,175 +373,101 @@ Results on strings of different lengths (3, 10, 1000)
     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction
-    =y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		xbar width=0.30,
+		no markers,Baseline/.style={red},2/.style={green},3/.style={blue}
+		%cycle list={red, orange, green, purple, black}
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=0.3413,
-          upper quartile=0.3421,
-          lower quartile=0.3398,
-          upper whisker=0.3559,
-          lower whisker=0.3351
-        },        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=0.3399,
-          upper quartile=0.3409,
-          lower quartile=0.3393,
-          upper whisker=0.3569,
-          lower whisker=0.3140
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=1.089,
-          upper quartile=1.090,
-          lower quartile=1.084,
-          upper whisker=1.143,
-          lower whisker=1.016
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=2.486,
-          upper quartile=2.488,
-          lower quartile=2.483,
-          upper whisker=2.612,
-          lower whisker=2.477
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    %draw=none,
+    %fill,
+    draw=black,
+    fill,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+]  
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   0.3147064   0.002288488 
+3   0.3035965   0.001786185
+4   0.8545431   0.006132950 
+5   2.250732    0.04133638 
+};            
       \end{axis}
     \end{tikzpicture}
-
     \subcaption{Size 0}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
-
     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction=y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=1.394,
-          upper quartile=1.396,
-          lower quartile=1.388,
-          upper whisker=1.416,
-          lower whisker=1.332
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=1.361,
-          upper quartile=1.366,
-          lower quartile=1.358,
-          upper whisker=1.380,
-          lower whisker=1.007
-        },
-        ] coordinates {};
-                \addplot+[
-        boxplot prepared={
-          median=3.887,
-          upper quartile=3.887,
-          lower quartile=3.884,
-          upper whisker=3.942,
-          lower whisker=2.294
-        },
-        ] coordinates {};
-                \addplot+[
-        boxplot prepared={
-          median=6.716,
-          upper quartile=6.744,
-          lower quartile=6.712,
-          upper whisker=6.970,
-          lower whisker=6.676
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   1.2505193   0.004611354 
+3   1.2295801   0.001810171
+4   2.8205415   0.008035024 
+5   7.089806    0.01403785 
+};            
       \end{axis}
     \end{tikzpicture}
 
     \subcaption{Size 5}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
-
-    \begin{tikzpicture}
+ \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction=y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		ymin=0,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-         \addplot+[
-        boxplot prepared={
-          median=8.569,
-          upper quartile=8.602,
-          lower quartile=8.562,
-          upper whisker=9.671,
-          lower whisker=8.510
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=8.938,
-          upper quartile=8.967,
-          lower quartile=8.935,
-          upper whisker=10.022,
-          lower whisker=6.044
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=16.22,
-          upper quartile=16.24,
-          lower quartile=16.21,
-          upper whisker=18.20,
-          lower whisker=10.40
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=16.66,
-          upper quartile=16.68,
-          lower quartile=16.44,
-          upper whisker=18.44,
-          lower whisker=16.43
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   6.6951738   0.062391122 
+3   6.6032572   0.024774416
+4   10.3029394   0.061481532 
+5   17.979611    0.10127936 
+};            
       \end{axis}
     \end{tikzpicture}
 
@@ -548,60 +475,34 @@ Results on strings of different lengths (3, 10, 1000)
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
 
-    \begin{tikzpicture}
+     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction
-    =y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		ymin=0,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=13.50,
-          upper quartile=13.55,
-          lower quartile=13.46,
-          upper whisker=14.42,
-          lower whisker=12.90
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=14.76,
-          upper quartile=14.82,
-          lower quartile=14.76,
-          upper whisker=15.71,
-          lower whisker=10.83
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=24.39,
-          upper quartile=24.41,
-          lower quartile=24.26,
-          upper whisker=25.98,
-          lower whisker=19.77
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=24.25,
-          upper quartile=24.30,
-          lower quartile=24.25,
-          upper whisker=25.82,
-          lower whisker=24.08
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   9.4064534   0.036698187 
+3   9.2138415   0.013982843
+4   13.4384830   0.040202717 
+5   26.404792    0.09298324 
+};            
       \end{axis}
     \end{tikzpicture}
     
@@ -619,55 +520,31 @@ Results on strings of different lengths (3, 10, 1000)
     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction
-    =y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		ymin=0,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=0.3162,
-          upper quartile=0.3179,
-          lower quartile=0.3072,
-          upper whisker=0.3720,
-          lower whisker=0.3022
-        },        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=0.3023,
-          upper quartile=0.3029,
-          lower quartile=0.3006,
-          upper whisker=0.3547,
-          lower whisker=0.2984
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=0.8538,
-          upper quartile=0.8591,
-          lower quartile=0.8482,
-          upper whisker=0.9920,
-          lower whisker=0.7516
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=2.142,
-          upper quartile=2.429,
-          lower quartile=2.120,
-          upper whisker=2.990,
-          lower whisker=2.038
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   0.3147064   0.002288488 
+3   0.3035965   0.001786185
+4   0.8545431   0.006132950 
+5   2.250732    0.04133638 
+};            
       \end{axis}
     \end{tikzpicture}
 
@@ -678,119 +555,65 @@ Results on strings of different lengths (3, 10, 1000)
     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction=y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=1.261,
-          upper quartile=1.270,
-          lower quartile=1.227,
-          upper whisker=1.282,
-          lower whisker=1.205
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=1.229,
-          upper quartile=1.235,
-          lower quartile=1.227,
-          upper whisker=1.248,
-          lower whisker=1.203
-        },
-        ] coordinates {};
-                \addplot+[
-        boxplot prepared={
-          median=2.832,
-          upper quartile=2.847,
-          lower quartile=2.814,
-          upper whisker=2.875,
-          lower whisker=2.706
-        },
-        ] coordinates {};
-                \addplot+[
-        boxplot prepared={
-          median=7.094,
-          upper quartile=7.138,
-          lower quartile=7.057,
-          upper whisker=7.212,
-          lower whisker=6.854
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   1.2505193   0.004611354 
+3   1.2295801   0.001810171
+4   2.8205415   0.008035024 
+5   7.089806    0.01403785 
+};            
       \end{axis}
     \end{tikzpicture}
-
     \subcaption{Size 5}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
-
-    \begin{tikzpicture}
+ \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction=y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		ymin=0,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-         \addplot+[
-        boxplot prepared={
-          median=6.746,
-          upper quartile=6.826,
-          lower quartile=6.622,
-          upper whisker=7.384,
-          lower whisker=5.307
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=6.581,
-          upper quartile=6.626,
-          lower quartile=6.553,
-          upper whisker=7.087,
-          lower whisker=6.362
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=10.330,
-          upper quartile=10.122,
-          lower quartile=10.461,
-          upper whisker=11.110,
-          lower whisker=9.246
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=18.08,
-          upper quartile=18.16,
-          lower quartile=17.79,
-          upper whisker=19.53,
-          lower whisker=16.36
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   6.6951738   0.062391122 
+3   6.6032572   0.024774416
+4   10.3029394  0.061481532 
+5   17.979611   0.10127936 
+};            
       \end{axis}
     \end{tikzpicture}
-
     \subcaption{Size 100}
     \end{subfigure}
     \begin{subfigure}[b]{.45\textwidth}
@@ -798,60 +621,34 @@ Results on strings of different lengths (3, 10, 1000)
     \begin{tikzpicture}
       \begin{axis}
       [
-    boxplot/draw direction
-    =y,
-        xtick={1,2,3,4,5},
+        xtick={1,...,5},
         xticklabels={Baseline, oldPlugin, SlangPlugin, PureSlang, Slang+JIT},
-        font={\tiny}
+        %x tick label as interval,
+        font={\tiny},
+		ybar=10pt,
+		ymin=0,
+		xbar width=0.30
         ]
-        \addplot+[
-        boxplot prepared={
-          median=1,
-          upper quartile=1,
-          lower quartile=1,
-          upper whisker=1,
-          lower whisker=1
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=9.485,
-          upper quartile=9.521,
-          lower quartile=9.314,
-          upper whisker=9.720,
-          lower whisker=8.831
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=9.212,
-          upper quartile=9.271,
-          lower quartile=9.173,
-          upper whisker=9.364,
-          lower whisker=8.979
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=13.48,
-          upper quartile=13.61,
-          lower quartile=13.33,
-          upper whisker=13.70,
-          lower whisker=12.81
-        },
-        ] coordinates {};
-        \addplot+[
-        boxplot prepared={
-          median=26.54,
-          upper quartile=26.80,
-          lower quartile=26.07,
-          upper whisker=27.12,
-          lower whisker=25.53
-        },
-        ] coordinates {};
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   9.4064534   0.036698187 
+3   9.2138415   0.013982843
+4   13.4384830  0.040202717 
+5   26.404792   0.09298324 
+};            
       \end{axis}
     \end{tikzpicture}
-    
+   
    \subcaption{Size 1000}
    \end{subfigure}
    \caption{LLVM-Mac results}
