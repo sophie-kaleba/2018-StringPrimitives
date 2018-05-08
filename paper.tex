@@ -319,8 +319,7 @@ In addition to the previous implementation, we've re-implemented here the primit
  - Number of impl to maintain 1,2,3 or more if multiple clients.
  - Performance: stack switch, C performacne, cross file inlining, (InterpreterProxy indirection)
  - Control on generated code, diff llvm gcc
- 
- \subsection{Comparison}
+
 
  \subsection{Comparison}
 
@@ -331,11 +330,28 @@ readability il faut des criteres concrets comme nombre de lignes meme si ca veut
 
 \cba{Probleme avec le tableau: Je lis + comme positif, - comme negatif. La Execution time je vois +++ au plus lent, c'est pas clair. X c'est interpret� par les anglosaxons comme NON, pour oui ils veulent le truc qui ressemble � un V}
 
+%\begin{table}
+%\centering
+%\begin{tabular}{|c|c|c||c||c|c|c||c|}
+%  \hline
+%    & \rot{readability} & \rot{maintenance} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
+%  \hline
+%  Baseline    & X &   & +   &    &   &   & +++ \\
+%  SmartSyntax & X &   & ++  &    & X & X & ++\\
+%  SlangPlugin &   &   & ++  &    & X & X & ++ \\
+%  PureSlang   &   & X & +++ &  X &   & X & ++\\
+%  Slang+JIT   &   & X & +++ &  X &   &   & + \\
+%  \hline
+%\end{tabular}
+%\caption{Trade-offs between implementations: summarized}
+%\label{tab:cmp_implem}
+%\end{table}
+
 \begin{table}
 \centering
 \begin{tabular}{|c|c|c||c||c|c|c||c|}
   \hline
-    & \rot{readability} & \rot{maintenance} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
+    & \rot{Number of implementations to maintain} & \rot{Number of lines} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
   \hline
   Baseline    & X &   & +   &    &   &   & +++ \\
   SmartSyntax & X &   & ++  &    & X & X & ++\\
@@ -355,15 +371,14 @@ Also, a VM recompilation affects the overall complexity of the development proce
 \section{Evaluation}
 \label{sec:eval}
 
-All these versions of the primitives have been implemented. Compare performances
+The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparison primitive have been recently (re)implemented in the Cog VM. In this section, we will compare the performances of these primitives against the other existing implementations performances. We have measures their respective execution times for different string sizes.
 
 \subsection{Set-up}
 
-Evaluaiton on x86 and not x64.
 
-GCC eval Ubuntu + machine spec
-
-The LLVM-Mac evaluaiton was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38).
+The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2,2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
+The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38). 
+The evaluation was performed on 32 bits VMs.
 
 \subsection{Micro-benchmarks}
 %%%
@@ -762,8 +777,8 @@ We can draw the following patterns from these results:
 \begin{itemize}
 \item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in Section \ref{sec:VMexec}.
 \item The Slang+JIT implementation is more efficient in every case. Nevertheless,
-the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop \sk{ref to appendix}
-\end{itemize} proves to be more and more time-consuming because of the higher number of iterations.
+the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
+\end{itemize} 
 
 
 However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{gcc} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
@@ -778,12 +793,6 @@ This difference is mainly due to the optimizations performed by both the compile
 		\caption{GCC and LLVM: different optimizations on the comparison loop}
 		\label{fig:Asm}
 \end{figure*}
-
-\cba{I think in the fig we should also see the ASM cog generate}
-
-\subsection{Macro-benchmarks}
-Intro sentence with ref to squeak speed center.
-JSON
 
 \section{Discussion and related work}
 
