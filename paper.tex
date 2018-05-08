@@ -323,41 +323,21 @@ In addition to the previous implementation, we've re-implemented here the primit
 
  \subsection{Comparison}
 
-
-\cba{Sophie on va se faire tuer, hacher menu et �tre donn� en pature � un �levage de porcs avec ton tableau: des termes comme maintenance c'est bcp trop subjectif. 
-Je pense il faut changer sur ce que j'ai mis plus haut qui est beaucoup plus objectif: number of impl to maintain pour maintenance par ex,
-readability il faut des criteres concrets comme nombre de lignes meme si ca veut rien dire, tout le monde utilise ce critere.}
-
-\cba{Probleme avec le tableau: Je lis + comme positif, - comme negatif. La Execution time je vois +++ au plus lent, c'est pas clair. X c'est interpret� par les anglosaxons comme NON, pour oui ils veulent le truc qui ressemble � un V}
-
-%\begin{table}
-%\centering
-%\begin{tabular}{|c|c|c||c||c|c|c||c|}
-%  \hline
-%    & \rot{readability} & \rot{maintenance} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
-%  \hline
-%  Baseline    & X &   & +   &    &   &   & +++ \\
-%  SmartSyntax & X &   & ++  &    & X & X & ++\\
-%  SlangPlugin &   &   & ++  &    & X & X & ++ \\
-%  PureSlang   &   & X & +++ &  X &   & X & ++\\
-%  Slang+JIT   &   & X & +++ &  X &   &   & + \\
-%  \hline
-%\end{tabular}
-%\caption{Trade-offs between implementations: summarized}
-%\label{tab:cmp_implem}
-%\end{table}
-
 \begin{table}
 \centering
-\begin{tabular}{|c|c|c||c||c|c|c||c|}
+\begin{tabular}{cccccccc}
   \hline
-    & \rot{Number of implementations to maintain} & \rot{Number of lines} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
+    & \rot{recompilation needed} & \rot{familiar to client dev} & \rot{familiar to vm dev}} & \rot{number of LoC} & \rot{Implementations to maintain} & \rot{Performance} & \rot{Control over generated code} \\
   \hline
-  Baseline    & X &   & +   &    &   &   & +++ \\
-  SmartSyntax & X &   & ++  &    & X & X & ++\\
-  SlangPlugin &   &   & ++  &    & X & X & ++ \\
-  PureSlang   &   & X & +++ &  X &   & X & ++\\
-  Slang+JIT   &   & X & +++ &  X &   &   & + \\
+  Baseline    &             & \checkmark  &            & 10  & 3+ &  +  &  \\
+   \hline
+  SmartSyntax &             &  \checkmark &            & 20  & 3+ & ++  & -\\
+   \hline
+  SlangPlugin &             &  \checkmark &            & 35  & 2  & ++  & - \\
+   \hline
+  PureSlang   & \checkmark  &             & \checkmark & 45  & 1  & ++  & -\\
+   \hline
+  Slang+JIT   & \checkmark  &             & \checkmark & 85  & 1  & ++++ & + \\
   \hline
 \end{tabular}
 \caption{Trade-offs between implementations: summarized}
@@ -365,7 +345,7 @@ readability il faut des criteres concrets comme nombre de lignes meme si ca veut
 \end{table}
 
 One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. The table \ref{cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RLT for instance.
-Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline bersion, could still be improved.
+Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline version, could still be improved.
 
 
 \section{Evaluation}
