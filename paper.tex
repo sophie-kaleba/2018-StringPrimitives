@@ -266,7 +266,7 @@ To fail without side-effects a primitive must validate any parameters and any st
 \end{itemize} 
  
 \paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative value if the first parameter is smaller than the second, 0 if they are equal, and a positive value if the first parameter is greater than the second one.
-\cba{Maybe rewrite the last paragraph to make it clearer / more formal.}
+\cba{Maybe rewrite the last paragraph to make it clearer / more formal. - CF Java spec ?}
 
 \section{Different primitive implementations}
 \label{sec:implem}
@@ -389,25 +389,36 @@ LLVM eval Mac OS X + machine spec.
 
 \subsection{Micro-benchmarks}
 
-\cba{Personnellement je ferais une figure, ou tu places tes graphes dedans, et pares tu referes a la figure dans le texte.}
+%%%
+% Legend definition (so I can change it once for all)
+%%%
 
+\def\legBase{Baseline}
+\def\legSmartSyntaxPlug{Smart Syntax}
+\def\legSlangPlug{Plugin}
+\def\legSlang{Pure Slang}
+\def\legRTL{Slang+JIT}
+
+%%%
+% End Legend
+%%%
 
 \begin{figure*}
   \centering
-  
-    \begin{subfigure}[b]{.45\textwidth}
-    
+    \begin{subfigure}[b]{\textwidth}
+    \begin{subfigure}[b]{.19\textwidth}
     \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		%xbar width=0.30,
-		no markers,Baseline/.style={red},2/.style={green},3/.style={blue}
-		%cycle list={red, orange, green, purple, black}
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -433,16 +444,57 @@ x   y           error
     \end{tikzpicture}
     \subcaption{Size 0}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+     \begin{subfigure}[b]{.19\textwidth}
     \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
+        ]
+\addplot[
+    fill=black!25,
+    %draw=none,
+    %fill,
+    draw=black,
+    fill,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+]  
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   0.3411212   0.0006746299 
+3   0.3375418   0.001577878
+4   1.077762   0.005363974 
+5   2.490423    0.004304882 
+};            
+      \end{axis}
+    \end{tikzpicture}
+    \subcaption{Size 1 TO UPDATE}
+    \end{subfigure}
+    \begin{subfigure}[b]{.19\textwidth}
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+        x=0.5cm,
+        xtick={1,...,5},
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
+        font={\footnotesize},
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -463,20 +515,21 @@ x   y           error
 };            
       \end{axis}
     \end{tikzpicture}
-
     \subcaption{Size 5}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.19\textwidth}
  \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		ymin=0,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -497,21 +550,21 @@ x   y           error
 };            
       \end{axis}
     \end{tikzpicture}
-
     \subcaption{Size 100}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
-
+    \begin{subfigure}[b]{.19\textwidth}
      \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		ymin=0,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin = 0
         ]
 \addplot[
     fill=black!25,
@@ -532,29 +585,27 @@ x   y           error
 };            
       \end{axis}
     \end{tikzpicture}
-    
    \subcaption{Size 1000}
    \end{subfigure}
-   \caption{GCC-Linux results}
-   \label{fig:gcc}
-\end{figure*}
-
-
-\begin{figure*}
-  \centering
-  
-    \begin{subfigure}[b]{.45\textwidth}
+  % \caption{GCC-Linux results}
+   % \label{fig:gcc}
+   \subcaption*{\textbf{GCC-Linux results}\vspace{0.3cm}}     
+   \end{subfigure}
+ \begin{subfigure}[b]{\textwidth}
+    \begin{subfigure}[b]{.19\textwidth}
     
     \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		ymin=0,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -578,17 +629,57 @@ x   y           error
 
     \subcaption{Size 0}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+     \begin{subfigure}[b]{.19\textwidth}
+    
+    \begin{tikzpicture}
+      \begin{axis}
+      [
+        x=0.5cm,
+        xtick={1,...,5},
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
+        font={\footnotesize},
+	ybar=10pt,
+	ymin=0
+        ]
+\addplot[
+    fill=black!25,
+    draw=black,
+    point meta=y,
+    every node near coord/.style={inner ysep=5pt},
+    error bars/.cd,
+        y dir=both,
+        y explicit
+] 
+table [y error=error] {
+x   y           error    
+1   1           0 
+2   0.3147064   0.002288488 
+3   0.3035965   0.001786185
+4   0.8545431   0.006132950 
+5   2.250732    0.04133638 
+};            
+      \end{axis}
+    \end{tikzpicture}
+
+    \subcaption{Size 1 TO UPDATE}
+    \end{subfigure}
+    \begin{subfigure}[b]{.19\textwidth}
 
     \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -611,17 +702,19 @@ x   y           error
     \end{tikzpicture}
     \subcaption{Size 5}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.19\textwidth}
  \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		ymin=0,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -644,18 +737,20 @@ x   y           error
     \end{tikzpicture}
     \subcaption{Size 100}
     \end{subfigure}
-    \begin{subfigure}[b]{.45\textwidth}
+    \begin{subfigure}[b]{.19\textwidth}
 
     \begin{tikzpicture}
       \begin{axis}
       [
+        x=0.5cm,
         xtick={1,...,5},
-        xticklabels={Baseline, SmartSyntax, Plugin, PureSlang, Slang+JIT},
-        %x tick label as interval,
+        xticklabel style={rotate=90},
+        bar width=0.3cm,
+        enlarge x limits={abs=0.45cm},
+        xticklabels={\legBase, \legSmartSyntaxPlug, \legSlangPlug, \legSlang, \legRTL},
         font={\footnotesize},
-		ybar=10pt,
-		ymin=0,
-		%xbar width=0.30
+	ybar=10pt,
+	ymin=0
         ]
 \addplot[
     fill=black!25,
@@ -679,7 +774,8 @@ x   y           error
    
    \subcaption{Size 1000}
    \end{subfigure}
-   \caption{LLVM-Mac results}
+   \subcaption*{\textbf{LLVM-Mac results}}
+    \end{subfigure}
    \label{fig:llvm}
 \end{figure*}
 
