@@ -347,13 +347,11 @@ Control on generated code => difference LLVM/GCC
  \subsection{Comparison}
 
 
-\cba{expliquer tableau comparatif}
-
 \begin{table}
 \centering
 \begin{tabular}{|c|c|c||c||c|c|c||c|}
   \hline
-    & \rot{readability} & \rot{maintenance} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Execution time} \\
+    & \rot{readability} & \rot{maintenance} & \rot{Engineering time} & \rot{re-compilation} & \rot{plugin} & \rot{stack switching} & \rot{Performance} \\
   \hline
   Baseline    & X &   & +   &    &   &   & +++ \\
   SmartSyntax & X &   & ++  &    & X & X & ++\\
@@ -366,13 +364,9 @@ Control on generated code => difference LLVM/GCC
 \label{tab:cmp_implem}
 \end{table}
 
-One or the other implementation could be chosen over another one, depending on what one's aiming at: the main trade-off will be between the engineering time and the performance. The table \ref{cmp_implem} summarizes the main pros and cons related to each implementation
+One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. The table \ref{cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RLT for instance. 
+Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline bersion, could still be improved.
 
-
-
-Trade-off engineering time and performance.
-- recompiler la VM ou pas (Plugin externes, code Smalltalk)
-- complexite d'implem (comprehension Smalltalk, C, ASM)
 
 \section{Evaluation}
 \label{sec:eval}
