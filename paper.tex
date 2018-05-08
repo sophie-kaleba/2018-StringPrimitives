@@ -311,24 +311,22 @@ In addition to the previous implementation, we've re-implemented here the primit
 
  \subsection{Pros and cons}
  
-  Can be changed like Smalltalk code (No C compilation whatsoever). Readability. Only impl without VM recompilation.
-
-Baseline performance is not that great.
-
-Number of implementations to maintain: 1, 2 or 3: same implem for primitive in C and fall back code in Smalltalk, relatively easy to read/code.
-recompilation. 
-changing the prim => changing all clients (VM compil from Pharo or Squeak different results
-Performance: cross file inlining not possible by default. (InterpreterProxy indirection)
-Control on generated code => difference LLVM/GCC
- Pure C performance (no interpreter proxy).
- no C-St jump. Control over the outcome (reliable performance)
- costly jumps between Smalltalk and C runtime (trampolines), need to recompile vm sources, little control over outcome (c compilers 
- need to recompile vm sources (trampolines), code readability 
+ - Requires recompilation of VM or plugin
+ - Implementation language familiar to client dev
+ - Implementation language familiar to vm dev
+ - readability: number of lines of code ? 
+ - Number of impl to maintain 1,2,3 or more if multiple clients.
+ - Performance: stack switch, C performacne, cross file inlining, (InterpreterProxy indirection)
+ - Control on generated code, diff llvm gcc
  
  \subsection{Comparison}
 
 
-\cba{expliquer tableau comparatif}
+\cba{Sophie on va se faire tuer, hacher menu et être donné en pature à un élevage de porcs avec ton tableau: des termes comme maintenance c'est bcp trop subjectif. 
+Je pense il faut changer sur ce que j'ai mis plus haut qui est beaucoup plus objectif: number of impl to maintain pour maintenance par ex,
+readability il faut des criteres concrets comme nombre de lignes meme si ca veut rien dire, tout le monde utilise ce critere.}
+
+\cba{Probleme avec le tableau: Je lis + comme positif, - comme negatif. La Execution time je vois +++ au plus lent, c'est pas clair. X c'est interpreté par les anglosaxons comme NON, pour oui ils veulent le truc qui ressemble à un V}
 
 \begin{table}
 \centering
