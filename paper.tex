@@ -265,8 +265,7 @@ To fail without side-effects a primitive must validate any parameters and any st
 	\item \emph{Order:} Having the order as the third operands is convenient in some cases (case insensitive comparison), but is just overhead in the common case (checking for string equality).
 \end{itemize} 
  
-\paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative value if the first parameter is smaller than the second, 0 if they are equal, and a positive value if the first parameter is greater than the second one.
-\cba{Maybe rewrite the last paragraph to make it clearer / more formal. - CF Java spec ? => This is critical, maybe in bold or in a box}
+\paragraph{Final specification.} The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative integer, zero, or a positive integer as the first parameter is less than, equal to, or greater than the second parameter.
 
 \section{Different primitive implementations}
 \label{sec:implem}
@@ -276,6 +275,7 @@ To fail without side-effects a primitive must validate any parameters and any st
  \subsection{Different implementations and executions}
  
 \paragraph{Baseline: pure Smalltalk.}
+\cba{Hum I believed that one should follow new specification and not old one ? With neg, 0 or pos value ?}
 : baseline
 Smalltalk code on top of VM. Used as our baseline for benchmarks.
 
