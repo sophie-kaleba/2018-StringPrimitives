@@ -573,6 +573,7 @@ x   y           error
   % \caption{GCC-Linux results}
    % \label{fig:gcc}
    \subcaption*{\textbf{GCC-Linux results}\vspace{0.3cm}}     
+   \label{fig:gcc}
    \end{subfigure}
  \begin{subfigure}[b]{\textwidth}
     \begin{subfigure}[b]{.19\textwidth}
@@ -759,11 +760,11 @@ x   y           error
    \end{subfigure}
    \subcaption*{\textbf{LLVM-Mac results}}
     \end{subfigure}
-   \label{fig:llvm}
+   \label{fig:bench}
 \end{figure*}
 
 %\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
-We performed the benchmarks upon 4 different string sizes: 0, 5, 100 and 1000 characters, using 2 different compilers: GCC on one hand and LLVM on the other hand. Figure \ref{fig:gcc} and \ref{fig:llvm} show the results in terms of relative speed-up towards the baseline implementation\footnote{i.e. the pure Smalltalk version}, respectively for GCC and LLVM.
+We performed the benchmarks upon 4 different string sizes: 0, 5, 100 and 1000 characters, using 2 different compilers: GCC on one hand and LLVM on the other hand. Figure \ref{fig:bench} show the results in terms of relative speed-up towards the baseline implementation\footnote{i.e. the pure Smalltalk version}, respectively for GCC and LLVM.
 
 We can draw the following patterns from these results:
 \begin{itemize}
