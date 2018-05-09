@@ -372,9 +372,12 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 
 \paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
-\todo{Add methodology section}
-\cba{Methodology section is missing here: each bench was run x times, each time being y comparison. We removed the loop overhead in the measurements. }
+\subsection{Methodology}
+
+\todo{fill methodology section}
+\cba{missing here: what are the benchmark actually run ? Can be short code sample or explanation of both. It has to include: each bench was run x times, each time being y comparison. We removed the loop overhead in the measurements.}
 \cba{+ we bench only = strings, which could make a difference on the plugin version (one less branch) - maybe we should change to number of character compared instead of string size so it does not imply the string are equals.}
+\cba{SM methodology: what is done? which benchmarks are used? how are they executed? what is measured? how do you address warmup etc? what kind of machine is used for the measurements?}
 
 \todo{Add exact results}
 \cba{We are also missing exact results, aside from the graphs I usually expect a table with exact results and error margins... That's why the plot is often generated from a file, the table can reuse the same file and you can re-do your bench without changing the latex code. Cf https://hal.inria.fr/hal-01596321/document page 9, it would be nice here to have a similar table below the benchs}
