@@ -852,11 +852,13 @@ In this paper we compare five different implementations of the string primitives
 %% Bibliography
 \bibliography{sista,rmod}
 
-\todo{Add some intro sentence here and there + maybe ASM in appendix}
 %% Appendix
+\vfill\null %switch column
 \appendix
 \section{Smart Syntax code}
 \label{SmartSyntaxAppendix}
+
+Source code of the smart syntax method, which is used to generate the C code for the plugin but also as Smalltalk fall-back code.
 
 \begin{code}
 compare: string1 with: string2 collated: order
@@ -880,10 +882,11 @@ compare: string1 with: string2 collated: order
 	len1 < len2 ifTrue: [^ 1] ifFalse: [^ 3].
 \end{code}
 
-\cba{Source code et generated C code et generated ASM code}
-
+\vfill\null %switch column
 \section{Slang Plugin code}
 \label{PluginAppendix}
+
+Source code of the plugin method generating the C code for the Slang plugin code. Most operations needs to go through the interpreter proxy. 
 
 \begin{code}
 primitiveCompareString
@@ -915,10 +918,11 @@ primitiveCompareString
 		(len1 = len2 ifTrue: [2] ifFalse: [len1 < len2 ifTrue: [1] ifFalse: [3]])
 \end{code}
 
-\cba{Source code et generated C code et generated ASM code}
-
+\vfill\null %switch column
 \section{Slang code}
 \label{SlangAppendix}
+
+Source code of the slang method generating the C code for the Slang string comparison primitive. We split it in two methods, and forced inlining at Slang-to-C compilation time to remove the closures while avoiding code duplication.
 
 \begin{code}
 primitiveCompareWith
@@ -950,8 +954,8 @@ primitiveCompareWith
 				[:str :index | objectMemory fetchByte: (objectMemory fetchByte: index ofObject: str) + 1 ofObject: order ]].
 
 	self methodReturnInteger: result
-\end{code}
-\begin{code}
+
+
 rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock: accessBlock
 	| c1 c2 min |
 	<inline: true> "needs to be forced else slang does not inline it by default"
@@ -963,10 +967,11 @@ rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBl
 	^strLength1 - strLength2
 \end{code}
 
-\cba{Source code et generated C code et generated ASM code}
-
+\vfill\null %switch column
 \section{Cog's RTL code}
 \label{RTLAppendix}
+
+Source code of the method generating the native code of the string comparison primitive on top of Cog's RTL. Method names starting with uppercase (in blue) are directly generating an abstract assembly instruction. Other methods called, starting with gen, generate a sequence of abstract assembly instructions. We duplicated the code checking if each operand is a ByteString and extract its size to generate better native code than doing the two operations separatedly.
 
 \begin{code}
 genPrimitiveStringCompareWith
@@ -1007,6 +1012,9 @@ genPrimitiveStringCompareWith
 	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string2CharOrByteSizeReg).
 	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg.
 	cogit SubR: TempReg R: string2CharOrByteSizeReg.
+	\end{code}
+	\vfill\null %switch column
+	\begin{code}
 	"Type and number of arguments are correct"
 	"Compute the min"	 
 	cogit CmpR: string1CharOrByteSizeReg R: string2CharOrByteSizeReg.
@@ -1039,7 +1047,5 @@ genPrimitiveStringCompareWith
 				jmpTarget: (jumpIncorrectFormat1 jmpTarget: cogit Label))).
 	^ CompletePrimitive}
 \end{code}
-
-\cba{Source code et generated ASM code}
 
 \end{document}
