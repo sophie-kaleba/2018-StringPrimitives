@@ -319,25 +319,24 @@ The Slang implementation is written inside the interpreter and has access to all
 
 In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is greater, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator. Since only performance critical implementations matter in this context, we've re-implemented only the case where there is 2 parameters. For the three parameter primitive, the VM falls-back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
-
- \subsection{Pros and cons}
- 
- - Requires recompilation of VM or plugin
- - Implementation language familiar to client dev
- - Implementation language familiar to vm dev
- - readability: number of lines of code ? 
- - Number of impl to maintain 1,2,3 or more if multiple clients.
- - Performance: stack switch, C performacne, cross file inlining, (InterpreterProxy indirection)
- - Control on generated code, diff llvm gcc
-
-
  \subsection{Comparison}
+ 
+ In this section we compare the five different implementations according to the following criteria:
+ \begin{itemize} 
+ 	\item \emph{Recompilation needed:} Diff no, plugin, full
+	\item \emph{Implementation language familiar to developers:} Merged the 2 latter, explain ST dev ST, VM dev ST-Slang-C-ASM, maybe result is + ou - ? or + or 0
+	\item \emph{Readability:} explain why number of lines of code. 
+	\item \emph{Number of implementations to maintain:} explain fall-back code which is in all languages, Slang/C, JIT => maybe we ignore the fall-back code ?
+	\item \emph{Stack switch from generated native code:} 
+	\item \emph{Optimization potential:} discuss inlining C comp cross file and InterpreterProxy indirection
+	\item \emph{Control over the generated code:} diff llvm gcc while JIT always the same
+\end{itemize}
 
 \begin{table}
 \centering
-\begin{tabular}{cccccccc}
+\begin{tabular}{lccccccc}
   \hline
-    & \rot{recompilation needed} & \rot{familiar to client dev} & \rot{familiar to vm dev}} & \rot{number of LoC} & \rot{Implementations to maintain} & \rot{Performance} & \rot{Control over generated code} \\
+    & \rot{recompilation needed} & \rot{familiar to client dev} & \rot{familiar to vm dev} & \rot{number of LoC} & \rot{Implementations to maintain} & \rot{Performance} & \rot{Control over generated code} \\
   \hline
   Baseline    &             & \checkmark  &            & 10  & 3+ &  +  &  \\
    \hline
@@ -354,21 +353,21 @@ In addition to the previous implementation, we've re-implemented here the primit
 \label{tab:cmp_implem}
 \end{table}
 
-One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. The table \ref{cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RLT for instance.
+One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. Table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RTL for instance.
 Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline version, could still be improved.
-
 
 \section{Evaluation}
 \label{sec:eval}
 
-The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparison primitive have been recently (re)implemented in the Cog VM. In this section, we will compare the performances of these primitives against the other existing implementations performances. We have measures their respective execution times for different string sizes.
+The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparison primitive have been recently implemented in the Cog VM. In this section, we will compare the performances of these primitives against the other existing implementations performances. We have measures their respective execution times for different string sizes.
 
 \subsection{Set-up}
 
+\paragraph{GCC-Linux.}The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2,2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
 
-The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2,2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
-The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38). 
-The evaluation was performed on 32 bits VMs.
+\paragraph{LLVM-Mac.}The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38). 
+
+\paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
 \subsection{Micro-benchmarks}
 %%%
@@ -755,8 +754,9 @@ x   y           error
 
    \subcaption{Size 1000}
    \end{subfigure}
-   \subcaption*{\textbf{LLVM-Mac results}}
+   \subcaption*{\textbf{LLVM-Mac results}\vspace{-0.5cm}}
     \end{subfigure}
+   \caption{String comparison benchmarks for strings of different sizes on different architectures}
    \label{fig:bench}
 \end{figure*}
 
@@ -771,7 +771,7 @@ the performance gap between this implementation and the PureSlang one tends to d
 \end{itemize} 
 
 
-However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{gcc} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
+However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
 This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
@@ -780,7 +780,7 @@ This difference is mainly due to the optimizations performed by both the compile
 \begin{figure*}[htp!]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop}
+		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{I want another column with comments, what does each line do. I need some different representation, no addresses, labels for jumps, something standard would be nice.}}
 		\label{fig:Asm}
 \end{figure*}
 
@@ -1018,7 +1018,7 @@ genPrimitiveStringCompareWith
 		jmpTarget: (jumpIncorrectFormat3 
 			jmpTarget: (jumpIncorrectFormat2 
 				jmpTarget: (jumpIncorrectFormat1 jmpTarget: cogit Label))).
-	^ CompletePrimitive
+	^ CompletePrimitive}
 \end{code}
 
 \cba{Source code et generated ASM code}
