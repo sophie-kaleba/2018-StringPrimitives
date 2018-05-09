@@ -379,7 +379,6 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 We assessed the execution time of the different implementations by running the following benchmark:
 
 \begin{code}
-Smalltalk garbageCollect.
 #(0 1 5 100 1000) collect: [ :size |
 	| iterations time overhead |
 	collection := ByteString new: size.
@@ -399,7 +398,7 @@ In each benchmark, we run a string comparison in a loop and measure the total ex
 The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). This addresses the warm-up of the JIT and allows the benchmarks to run at least 1 second in the slower implementations.
 The loop overhead is measured and removed from the measurements.
 
-\cba{+ we bench only = strings, which could make a difference on the plugin version (one less branch) - maybe we should change to number of character compared instead of string size so it does not imply the string are equals.}
+The 2 compared strings are equal as it corresponds to the worst scenario for most of our benched implementations \footnote{There is one branch less in the SlangPlugin implementation in this case}.  
 
 
 \begin{table*}[bht]
@@ -829,7 +828,7 @@ the performance gap between this implementation and the PureSlang one tends to d
 \begin{figure*}[bth]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{on peut enlever les adresses je pense ca sert a rien en vrai et comme ca les fonts pourront etre plus grosses}}
+		\caption{GCC and LLVM: different optimizations on the comparison loop}
 		\label{fig:Asm}
 \end{figure*}
 
