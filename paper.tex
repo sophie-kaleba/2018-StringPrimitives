@@ -818,15 +818,18 @@ In our context, implementing a similar approach would require us to compile Slan
 \section{Future work and conclusion}
 \todo{Write section}
 
-\paragraph{Future work.}
-\cba{Future work -> primitive processor dependent (i.e. SSE4 instrs), pros and cons and why you did not do it (ingeniering cost per back-end)}
-\cba{Inlining in Sista + ref}
-\cite{SistaFastStartUp}
+\paragraph{Future work: back-end specific.}
+
+All the primitive we compare are written in a processor independent way, due to the C compiler abstraction for the Slang versions, the abstract assembly abstraction for Cog's RTL version or the VM abstraction for the baseline implementation in Smalltalk. We could rewrite the primitive differently for each back-end currently supported (x86, x64, MIPSEL, ARMv6) and yet to support (ARMv8, ...). It could be relevant in some cases performance-wise, for example, on intel processors, the JVM implements string comparison using the SSE4.2 string comparison instructions when available \cite{JVMSSE4StringComp}. We did not go in this direction because the maintenance cost in this case is definitely too high since we would have to maintain a different implementation per back-end  (already 4 implementations today).
+
+\paragraph{Future work: adaptive optimizer integration.}
+
+Inlining in Sista
+We need to add support, are we going to have a new representation to maintain and evolve \cite{SistaFastStartUp}
 
 \paragraph{Conclusion.}
 
-trade off expressiveness performance: number of representations \& complexity of each representation vs performance
-1 sentence opening: 1 common representation is nice but lots of engineering work like V8 ? 
+In this paper we compare five different implementations of the string primitives on top of the Cog VM. Choosing the right implementation for one's VM is a trade-off between maintenance cost and execution time, the quickest to execute the primitive is, the harder it is to maintain. 
 
 %% Acknowledgments
 %%\begin{acks}                            %% acks environment is optional
