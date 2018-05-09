@@ -73,7 +73,7 @@
 \newcommand{\sd}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Stef:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\sk}[1]{\color{blue}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\cba}[1]{\color{purple}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
-\newcommand*\rot{\rotatebox{90}}
+%\newcommand*{rotatebox{75}}
 \input{macros}
 
 \begin{document}
@@ -228,7 +228,7 @@ The executable is generated in two steps as shown on Figure~\ref{fig:VMCompilati
 \cba{We need to introduce here the concept of VM plugin and interpreterproxy indirection/overhead. This is very important since later we just say this is a plugin and we don't redefine it}
 \sk{done but someone better check what I wrote :-)}
 
-VM plugins enable the addition of new features to the VM. There are 2 types of plugins: the built-ins and the externals. 
+VM plugins enable the addition of new features to the VM. There are 2 types of plugins: the built-ins and the externals.
 \begin{itemize}
 \item External plugins. Plugins that can be added or removed from the VM without the need to recompile the VM sources.
 \item Built-in plugins. Plugins that cannot be installed without recompiling the VM sources. However, these plugins can reach some parts of the VM internals\footnote{as data structures, routines...} that remains unreachable from an external plugin. These operations are performed via an InterpreterProxy. Although, this solution results in a substential overhead if called often.
@@ -322,40 +322,41 @@ The Slang implementation is written inside the interpreter and has access to all
 In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is greater, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator. Since only performance critical implementations matter in this context, we've re-implemented only the case where there is 2 parameters. For the three parameter primitive, the VM falls-back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
  \subsection{Comparison}
- 
- \todo{Finish section}
- 
- In this section we compare the five different implementations according to the following criteria:
- \begin{itemize} 
- 	\item \emph{Recompilation needed:} Diff no, plugin, full
-	\item \emph{Implementation language familiar to developers:} Merged the 2 latter, explain ST dev ST, VM dev ST-Slang-C-ASM, maybe result is + ou - ? or + or 0
-	\item \emph{Readability:} explain why number of lines of code. 
-	\item \emph{Number of implementations to maintain:} explain fall-back code which is in all languages, Slang/C, JIT => maybe we ignore the fall-back code ?
-	\item \emph{Stack switch from generated native code:} 
-	\item \emph{Optimization potential:} discuss inlining C comp cross file and InterpreterProxy indirection
-	\item \emph{Control over the generated code:} diff llvm gcc while JIT always the same
-\end{itemize}
 
-\begin{table}
+\begin{table*} [bth]
 \centering
 \begin{tabular}{lccccccc}
   \hline
-    & \rot{recompilation needed} & \rot{familiar to client dev} & \rot{familiar to vm dev} & \rot{number of LoC} & \rot{Implementations to maintain} & \rot{Performance} & \rot{Control over generated code} \\
+    & Recompilation & Familiar to & Lignes & Number of & Stack switch & Optimization & Code generation \\
+    & required & developers & of code & implementations & overhead & potential & control \\
   \hline
-  Baseline    &             & \checkmark  &            & 10  & 3+ &  +  &  \\
+  Baseline    & No & All  & 10  & 0 & No & - & - \\
    \hline
-  SmartSyntax &             &  \checkmark &            & 20  & 3+ & ++  & -\\
+  SmartSyntax & Plugin & VM & 20  & 3+ & Yes  & Limited & Low \\
    \hline
-  SlangPlugin &             &  \checkmark &            & 35  & 2  & ++  & - \\
+  SlangPlugin & Plugin & VM & 35  & 1  & Yes & Limited & Low \\
    \hline
-  PureSlang   & \checkmark  &             & \checkmark & 45  & 1  & ++  & -\\
+  PureSlang   & Yes  & VM & 45  & 1  & Yes & High & Low \\
    \hline
-  Slang+JIT   & \checkmark  &             & \checkmark & 85  & 1  & ++++ & + \\
+  Slang+JIT   & Yes  & VM-JIT & 85  & 2  & No & High & Full \\
   \hline
 \end{tabular}
-\caption{Trade-offs between implementations: summarized}
+\caption{Comparison between implementations\vspace{-0.5cm}}
 \label{tab:cmp_implem}
-\end{table}
+\end{table*}
+
+ In this section we compare the five different implementations according to the following criteria:
+ \begin{itemize}
+ 	\item \emph{Recompilation required:} Changing the implementation requires only Smalltalk bytecode recompilation (No), requires to recompile a plugin to a dynamic library if compiled as external or the recompilation of the full VM if compiled as internal (-) or requires to recompile the full VM (Yes).
+	\item \emph{Implementation language familiar to developers:} Smalltalk application developers are considered to be familiar with Smalltalk only, while Cog VM developers are considered being familiar with Smalltalk, Slang, C and Assembly code. Only Cog's JIT implementors are familiar with its RTL, which is a subset of the VM developers.  We use \emph{All} if all communities are familiar with the language, \emph{VM} if all VM developers are and \emph{VM-JIT} if only a subset of VM developers are.
+	\item \emph{Readability:} To evaluate the readability of the approach, we use one of the most used metric, the number of lines of code.
+	\item \emph{Number of implementations to maintain:} In each case, the client language has to implement a fall-back code in Smalltalk to execute if the primitive fails. This code is maintain by the client language implementors, and not by the VM implementors. Hence we do not count the fall-back code in the number of implementation to maintain, nor the pure Smalltalk implementation. However, as a VM implementor, we need to maintain what generates the C code of the VM, hence, in the case of Smart Syntax, we need to maintain a different method in each client language. We also count all the Slang implementations as well as the ones on Cog's RTL.
+	\item \emph{Stack switch overhead:} Yes if activating the primitive from the native code generated by the JIT requires to switch between the C and the client stack, inducing execution time overhead.
+	\item \emph{Optimization potential:} \todo{}
+	discuss inlining C comp cross file and InterpreterProxy indirection
+	Smalltalk we control indirectly.
+	\item \emph{Control over the generated code:} \todo{}diff llvm gcc while JIT always the same
+\end{itemize}
 
 One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. Table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RTL for instance.
 Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline version, could still be improved.
@@ -369,13 +370,13 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 
 \paragraph{GCC-Linux.}The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2,2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
 
-\paragraph{LLVM-Mac.}The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38). 
+\paragraph{LLVM-Mac.}The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38).
 
 \paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
 \subsection{Methodology}
 
-We assessed the execution time of the different implementations by running the following benchmark: 
+We assessed the execution time of the different implementations by running the following benchmark:
 
 \begin{code}
 Smalltalk garbageCollect.
@@ -386,14 +387,14 @@ Smalltalk garbageCollect.
 	size < 100 ifTrue: [iterations := (100000000 // (size*10 max: 1) sqrt) floor.]
 			   ifFalse: [iterations := (10000000 // size sqrt) floor.].
 	overhead := [ 1 to: iterations do: [ :i | ] ] timeToRun.
-	time := [ 1 to: iterations do: [ :i | 
+	time := [ 1 to: iterations do: [ :i |
 		collection compareWithSlang: collection2 ] ] timeToRun.
 	stream nextPutAll: ((time - overhead) asString)].
 \end{code}\\
-	
-	
-Each benchmark was measured 30 times.		
-		
+
+
+Each benchmark was measured 30 times.
+
 In each benchmark, we run a string comparison in a loop and measure the total execution time.
 The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). This addresses the warm-up of the JIT and allows the benchmarks to run at least 1 second in the slower implementations.
 The loop overhead is measured and removed from the measurements.
@@ -409,7 +410,7 @@ The loop overhead is measured and removed from the measurements.
    \hline
   \multirow{2}{*}{SmartSyntax} &GCC & 0.3411 +- 0.0007 & 0.6014 +- 0.0023 & 1.3891 +- 0.0023 &  8.6796 +- 0.0587 & 13.6051 +- 0.0589\\
  							   &LLVM & 0.3147 +- 0.0023 & 0.5606 +- 0.0022 & 1.2505 +- 0.0046 & 10.3029 +- 0.0624 & 9.4065 +- 0.0367\\
-   \hline    
+   \hline
   \multirow{2}{*}{SlangPlugin} &GCC& 0.3375 +- 0.0016 & 0.5654 +- 0.0078 & 1.3150 +- 0.0205 & 8.9585 +- 0.1170  & 14.7789 +- 0.1471 \\
   							   &LLVM& 0.3036 +- 0.0018 & 0.5567 +- 0.0010 & 1.2296 +- 0.0018 & 6.6033 +- 0.0248  & 9.2138 +- 0.0140 \\
    \hline
@@ -823,21 +824,20 @@ We can draw the following patterns from these results:
 \item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in Section \ref{sec:VMexec}.
 \item The Slang+JIT implementation is more efficient in every case. Nevertheless,
 the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
-\end{itemize} 
+\end{itemize}
 
+\begin{figure*}[bth]
+		\centering
+		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
+		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{on peut enlever les adresses je pense ca sert a rien en vrai et comme ca les fonts pourront etre plus grosses}}
+		\label{fig:Asm}
+\end{figure*}
 
 However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
 This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
 \sk{parler des autres optis qui n'ont pas d'impact négatif sur le temps d'exec ? ou le conserver pour les future work pour des potentielles améliorations?}
-
-\begin{figure*}[htp!]
-		\centering
-		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop}
-		\label{fig:Asm}
-\end{figure*}
 
 \section{Discussion and related work}
 
@@ -871,7 +871,7 @@ For the past few years, an experimental adaptive optimizer (a JIT featuring adva
 
 \paragraph{Conclusion.}
 
-In this paper we compare five different implementations of the string primitives on top of the Cog VM. Choosing the right implementation for one's VM is a trade-off between maintenance cost and execution time, the quickest to execute the primitive is, the harder it is to maintain. 
+In this paper we compare five different implementations of the string primitives on top of the Cog VM. Choosing the right implementation for one's VM is a trade-off between maintenance cost and execution time, the quickest to execute the primitive is, the harder it is to maintain.
 
 %% Acknowledgments
 %%\begin{acks}                            %% acks environment is optional
@@ -894,8 +894,11 @@ In this paper we compare five different implementations of the string primitives
 %% Bibliography
 \bibliography{sista,rmod}
 
-\todo{Add some intro sentence here and there + maybe ASM in appendix}
+%\vspace{10cm} %Adapt to make vfill work
+
 %% Appendix
+\null \vfill\null %switch column
+
 \appendix
 \section{Smart Syntax code}
 \label{SmartSyntaxAppendix}
@@ -916,7 +919,7 @@ compare: string1 with: string2 collated: order
 		[:i |
 		c1 := order at: (string1 basicAt: i) + 1.
 		c2 := order at: (string2 basicAt: i) + 1.
-		c1 = c2 ifFalse: 
+		c1 = c2 ifFalse:
 			[c1 < c2 ifTrue: [^ 1] ifFalse: [^ 3]]].
 	len1 = len2 ifTrue: [^ 2].
 	len1 < len2 ifTrue: [^ 1] ifFalse: [^ 3].
@@ -947,7 +950,7 @@ primitiveCompareString
 	len2 := interpreterProxy sizeOfSTArrayFromCPrimitive: string2.
 	(interpreterProxy sizeOfSTArrayFromCPrimitive: order) < 256 ifTrue:
 		[^interpreterProxy primitiveFailFor: PrimErrBadArgument].
-	0 to: (len1 min: len2) - 1 do: 
+	0 to: (len1 min: len2) - 1 do:
 		[ :i | | c1 c2 |
 		c1 := order at: (string1 at: i).
 		c2 := order at: (string2 at: i).
@@ -965,9 +968,9 @@ primitiveCompareString
 \begin{code}
 primitiveCompareWith
 	"<string1> primitiveCompareWith: string2 [collated: order] "
-	<export: true>	
+	<export: true>
 	| string1 string2 order strLength1 strLength2 result |
-	"1 - fetch the parameters from the stack"	
+	"1 - fetch the parameters from the stack"
 	argumentCount = 1 ifFalse:
 		[argumentCount ~= 2 ifTrue:
 			[^self primitiveFailFor: PrimErrBadNumArgs].
@@ -976,18 +979,18 @@ primitiveCompareWith
 			 and: [(objectMemory numBytesOfBytes: order) = 256]) ifFalse:
 				[^self primitiveFailFor: PrimErrBadArgument]].
 	string1 := self stackValue: argumentCount.
-	string2 := self stackValue: argumentCount - 1. 		
+	string2 := self stackValue: argumentCount - 1.
 	"2 - check their types - all parameters are ByteObject"
 	((objectMemory isBytes: string1)
-	 and: [objectMemory isBytes: string2]) ifFalse: 
+	 and: [objectMemory isBytes: string2]) ifFalse:
 		[^self primitiveFailFor: PrimErrBadArgument].
-	"3 - compare the strings"	
+	"3 - compare the strings"
 	strLength1 := objectMemory numBytesOfBytes: string1.
 	strLength2 := objectMemory numBytesOfBytes: string2.
-	result := order 
+	result := order
 		ifNil: [self rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock:
 				[:str :index | objectMemory fetchByte: index ofObject: str ]]
-		ifNotNil: 
+		ifNotNil:
 			[self rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock:
 				[:str :index | objectMemory fetchByte: (objectMemory fetchByte: index ofObject: str) + 1 ofObject: order ]].
 
@@ -998,7 +1001,7 @@ rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBl
 	| c1 c2 min |
 	<inline: true> "needs to be forced else slang does not inline it by default"
 	min := strLength1 min: strLength2.
-	0 to: min-1 do: 
+	0 to: min-1 do:
 		[:i | c1 := accessBlock value: string1 value: i.
 			c2 := accessBlock value: string2 value: i.
 			c1 = c2 ifFalse: [^c1 - c2]].
@@ -1034,50 +1037,50 @@ genPrimitiveStringCompareWith
 	cogit CmpCq: objectMemory firstByteFormat R: TempReg.
 	jumpIncorrectFormat1 := cogit JumpLess: 0.
 	cogit CmpCq: objectMemory firstCompiledMethodFormat R: TempReg.
-	jumpIncorrectFormat2 := cogit JumpAboveOrEqual: 0.	
+	jumpIncorrectFormat2 := cogit JumpAboveOrEqual: 0.
 	self genGetNumSlotsOf: string1Reg into: string1CharOrByteSizeReg.
-	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string1CharOrByteSizeReg). 
-	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg. 
-	cogit SubR: TempReg R: string1CharOrByteSizeReg. 
+	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string1CharOrByteSizeReg).
+	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg.
+	cogit SubR: TempReg R: string1CharOrByteSizeReg.
 	"checks if string2 is a byteobject and get its size in bytes"
 	self genGetFormatOf: string2Reg into: TempReg.
 	cogit CmpCq: objectMemory firstByteFormat R: TempReg.
 	jumpIncorrectFormat3 := cogit JumpLess: 0.
 	cogit CmpCq: objectMemory firstCompiledMethodFormat R: TempReg.
-	jumpIncorrectFormat4 := cogit JumpAboveOrEqual: 0.	
+	jumpIncorrectFormat4 := cogit JumpAboveOrEqual: 0.
 	self genGetNumSlotsOf: string2Reg into: string2CharOrByteSizeReg.
 	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string2CharOrByteSizeReg).
 	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg.
 	cogit SubR: TempReg R: string2CharOrByteSizeReg.
 	"Type and number of arguments are correct"
-	"Compute the min"	 
+	"Compute the min"
 	cogit CmpR: string1CharOrByteSizeReg R: string2CharOrByteSizeReg.
-	jumpAbove := cogit JumpBelow: 0. 
-	cogit MoveR: string1CharOrByteSizeReg R: minSizeReg. 
-	jump := cogit Jump: 0. 
-	jumpAbove jmpTarget: (cogit MoveR: string2CharOrByteSizeReg R: minSizeReg). 
-	jump jmpTarget: (cogit CmpCq: 0 R: minSizeReg). 
+	jumpAbove := cogit JumpBelow: 0.
+	cogit MoveR: string1CharOrByteSizeReg R: minSizeReg.
+	jump := cogit Jump: 0.
+	jumpAbove jmpTarget: (cogit MoveR: string2CharOrByteSizeReg R: minSizeReg).
+	jump jmpTarget: (cogit CmpCq: 0 R: minSizeReg).
 	jumpSuccess := cogit JumpZero: 0. "if one of the string is empty, no need to go through the comparing loop"
 	"Compare the bytes"
 	cogit MoveCq: objectMemory baseHeaderSize  R: TempReg.
 	cogit AddCq: objectMemory baseHeaderSize R: minSizeReg.
 	instr := cogit MoveXbr: TempReg R: string1Reg R: string1CharOrByteSizeReg.
 	cogit MoveXbr: TempReg R: string2Reg R: string2CharOrByteSizeReg.
-	cogit SubR: string2CharOrByteSizeReg R: string1CharOrByteSizeReg. 
+	cogit SubR: string2CharOrByteSizeReg R: string1CharOrByteSizeReg.
 	jumpMidFailure := cogit JumpNonZero: 0. "the 2 compared characters are different, exit the loop"
 	cogit AddCq: 1 R: TempReg.
-	cogit CmpR: TempReg R: minSizeReg. 
+	cogit CmpR: TempReg R: minSizeReg.
 	cogit JumpNonZero: instr.
 	"all bytes from 1 to minSize are equal"
 	self genGetNumBytesOf: string1Reg into: string1CharOrByteSizeReg.
 	self genGetNumBytesOf: string2Reg into: string2CharOrByteSizeReg.
 	jumpSuccess jmpTarget: (cogit SubR: string2CharOrByteSizeReg R: string1CharOrByteSizeReg).
-	jumpMidFailure  jmpTarget: (cogit MoveR: string1CharOrByteSizeReg R: ReceiverResultReg).	
+	jumpMidFailure  jmpTarget: (cogit MoveR: string1CharOrByteSizeReg R: ReceiverResultReg).
 	self genConvertIntegerToSmallIntegerInReg: ReceiverResultReg.
 	cogit genPrimReturn.
-	jumpIncorrectFormat4 
-		jmpTarget: (jumpIncorrectFormat3 
-			jmpTarget: (jumpIncorrectFormat2 
+	jumpIncorrectFormat4
+		jmpTarget: (jumpIncorrectFormat3
+			jmpTarget: (jumpIncorrectFormat2
 				jmpTarget: (jumpIncorrectFormat1 jmpTarget: cogit Label))).
 	^ CompletePrimitive}
 \end{code}
