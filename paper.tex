@@ -816,7 +816,8 @@ To avoid paying the stack switch cost between the client Stack and the C stack, 
 In our context, implementing a similar approach would require us to compile Slang to native code through our JIT compiler back-end or to rewrite the interpreter on top of Cog JIT's RTL. Slang has some abstractions over native code, similarly to C. Compiling Slang ahead of time to native code efficiently requires us to re-implement optimizations implemented in C compilers and we don't want that complexity or to lower the abstractions level of Slang to express native code optimizations, which would increase the complexity of Slang, which we don't want either. Rewriting the interpreter on top of Cog JIT's RTL is possible but requires a significant amount of work.
 
 \section{Future work and conclusion}
-\todo{Write section}
+
+In this section we discuss two future work directions and conclude.
 
 \paragraph{Future work: back-end specific.}
 
@@ -824,8 +825,7 @@ All the primitive we compare are written in a processor independent way, due to 
 
 \paragraph{Future work: adaptive optimizer integration.}
 
-Inlining in Sista
-We need to add support, are we going to have a new representation to maintain and evolve \cite{SistaFastStartUp}
+For the past few years, an experimental adaptive optimizer (a JIT featuring advanced optimizations such as speculative inlining) has been developed on top of the Cog VM \cite{SistaFastStartUp}. The optimizer has specific rules to be able to inline primitive operations without performance loss. We need to carefully measure, in different benchmarks, the performance of the inlined string comparison primitive. We also need to discuss the maintenance cost, for example, do we need a new representation of the primitive for the optimizing JIT to inline it? The micro-benchmarks used in the paper were relevant to show the client stack to C stack switch overhead as well as baseline performance. In the optimizing JIT context, such micro-benchmarks are not really relevant anymore since the optimizing JIT usually entirely optimizes away such benchmarks and real-application performance depends on how well the primitive is inlined and specialized using information from the optimized method (typically, if one operand of the string comparison is a constant string, can the generated code benefit from this knowledge?).
 
 \paragraph{Conclusion.}
 
