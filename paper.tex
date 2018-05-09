@@ -369,6 +369,10 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 
 \paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
+\cba{Methodology section is missing here: each bench was run x times, each time being y comparison. We removed the loop overhead in the measurements. }
+\cba{+ we bench only = strings, which could make a difference on the plugin version (one less branch) - maybe we should change to number of character compared instead of string size so it does not imply the string are equals.}
+\cba{We are also missing exact results, aside from the graphs I usually expect a table with exact results and error margins... That's why the plot is often generated from a file, the table can reuse the same file and you can re-do your bench without changing the latex code. Cf https://hal.inria.fr/hal-01596321/document page 9, it would be nice here to have a similar table below the benchs}
+
 \subsection{Micro-benchmarks}
 %%%
 % Legend definition (so I can change it once for all)
@@ -384,7 +388,7 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 % End Legend
 %%%
 
-\begin{figure*}
+\begin{figure*}[bht]
   \centering
     \begin{subfigure}[b]{\textwidth}
     \begin{subfigure}[b]{.19\textwidth}
@@ -754,14 +758,14 @@ x   y           error
 
    \subcaption{Size 1000}
    \end{subfigure}
-   \subcaption*{\textbf{LLVM-Mac results}\vspace{-0.5cm}}
+   \subcaption*{\textbf{LLVM-Mac results}\vspace{-0.2cm}} %change vspace based on fig position
     \end{subfigure}
    \caption{String comparison benchmarks for strings of different sizes on different architectures}
    \label{fig:bench}
 \end{figure*}
 
 %\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
-We performed the benchmarks upon 4 different string sizes: 0, 5, 100 and 1000 characters, using 2 different compilers: GCC on one hand and LLVM on the other hand. Figure \ref{fig:bench} show the results in terms of relative speed-up towards the baseline implementation\footnote{i.e. the pure Smalltalk version}, respectively for GCC and LLVM.
+We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters, using two different compilers: GCC on one hand and LLVM on the other hand. Figure \ref{fig:bench} show the results in terms of relative speed-up towards the baseline implementation\footnote{i.e. the pure Smalltalk version}, respectively for GCC and LLVM.
 
 We can draw the following patterns from these results:
 \begin{itemize}
@@ -780,7 +784,7 @@ This difference is mainly due to the optimizations performed by both the compile
 \begin{figure*}[htp!]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{I want another column with comments, what does each line do. I need some different representation, no addresses, labels for jumps, something standard would be nice.}}
+		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{I would like another column with comments, what does each line do. I need some different representation, no addresses, labels for jumps, something standard would be nice. Ca peut être un truc comme dans ce papier que j'ai fait https://hal.archives-ouvertes.fr/hal-01356338 mais c'est pas super fou, sinon dans la these de Urs http://www.cs.ucsb.edu/~urs/oocsb/self/papers/urs-thesis.html , par ex page 61, il y a une autre facon de faire qui est mieux}}
 		\label{fig:Asm}
 \end{figure*}
 
