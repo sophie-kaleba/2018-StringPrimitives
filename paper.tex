@@ -64,6 +64,7 @@
 \usepackage{ifthen}
 \usepackage{pgfplots}
 \usepackage{listings}
+\usepackage{multirow}
 \usepgfplotslibrary{statistics}
 %\input{macros.tex}
 
@@ -399,8 +400,29 @@ The loop overhead is measured and removed from the measurements.
 
 \cba{+ we bench only = strings, which could make a difference on the plugin version (one less branch) - maybe we should change to number of character compared instead of string size so it does not imply the string are equals.}
 
-\todo{Add exact results}
-\cba{We are also missing exact results, aside from the graphs I usually expect a table with exact results and error margins... That's why the plot is often generated from a file, the table can reuse the same file and you can re-do your bench without changing the latex code. Cf https://hal.inria.fr/hal-01596321/document page 9, it would be nice here to have a similar table below the benchs}
+
+\begin{table*}[bht]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|c|}
+  \hline
+    & & 0 & 1 & 5 & 100 & 1000 \\
+   \hline
+  \multirow{2}{*}{SmartSyntax} &GCC & 0.3411 +- 0.0007 & 0.6014 +- 0.0023 & 1.3891 +- 0.0023 &  8.6796 +- 0.0587 & 13.6051 +- 0.0589\\
+ 							   &LLVM & 0.3147 +- 0.0023 & 0.5606 +- 0.0022 & 1.2505 +- 0.0046 & 10.3029 +- 0.0624 & 9.4065 +- 0.0367\\
+   \hline    
+  \multirow{2}{*}{SlangPlugin} &GCC& 0.3375 +- 0.0016 & 0.5654 +- 0.0078 & 1.3150 +- 0.0205 & 8.9585 +- 0.1170  & 14.7789 +- 0.1471 \\
+  							   &LLVM& 0.3036 +- 0.0018 & 0.5567 +- 0.0010 & 1.2296 +- 0.0018 & 6.6033 +- 0.0248  & 9.2138 +- 0.0140 \\
+   \hline
+  \multirow{2}{*}{PureSlang} &GCC& 1.0778 +- 0.0054 & 1.8169 +- 0.0191 & 3.8190 +- 0.0545 & 15.8095 +- 0.3005 & 24.4178 +- 0.1863\\
+ 							 &LLVM& 0.8545 +- 0.0061 & 1.5605 +- 0.0064 & 2.8205 +- 0.0080 & 10.3029 +- 0.0615  & 13.4385 +- 0.0402 \\
+   \hline
+  \multirow{2}{*}{Slang+JIT} &GCC& 2.4904 +- 0.0043 & 3.5378 +- 0.0124  & 6.7405 +- 0.0108 & 16.7527 +- 0.1063 & 24.4801 +- 0.0950\\
+ 							&LLVM & 2.2507 +- 0.0413 & 3.7545 +- 0.0111 & 7.0898 +- 0.0140 & 17.9796 +- 0.1013  & 26.4048 +- 0.0930 \\
+  \hline
+\end{tabular}
+\caption{Benchmark results with standard errors. Average relative speed-up regarding baseline}
+\label{tab:detail_bench}
+\end{table*}
 
 \subsection{Micro-benchmarks}
 %%%
@@ -872,13 +894,11 @@ In this paper we compare five different implementations of the string primitives
 %% Bibliography
 \bibliography{sista,rmod}
 
+\todo{Add some intro sentence here and there + maybe ASM in appendix}
 %% Appendix
-\vfill\null %switch column
 \appendix
 \section{Smart Syntax code}
 \label{SmartSyntaxAppendix}
-
-Source code of the smart syntax method, which is used to generate the C code for the plugin but also as Smalltalk fall-back code.
 
 \begin{code}
 compare: string1 with: string2 collated: order
@@ -902,11 +922,10 @@ compare: string1 with: string2 collated: order
 	len1 < len2 ifTrue: [^ 1] ifFalse: [^ 3].
 \end{code}
 
-\vfill\null %switch column
+\cba{Source code et generated C code et generated ASM code}
+
 \section{Slang Plugin code}
 \label{PluginAppendix}
-
-Source code of the plugin method generating the C code for the Slang plugin code. Most operations needs to go through the interpreter proxy. 
 
 \begin{code}
 primitiveCompareString
@@ -938,11 +957,10 @@ primitiveCompareString
 		(len1 = len2 ifTrue: [2] ifFalse: [len1 < len2 ifTrue: [1] ifFalse: [3]])
 \end{code}
 
-\vfill\null %switch column
+\cba{Source code et generated C code et generated ASM code}
+
 \section{Slang code}
 \label{SlangAppendix}
-
-Source code of the slang method generating the C code for the Slang string comparison primitive. We split it in two methods, and forced inlining at Slang-to-C compilation time to remove the closures while avoiding code duplication.
 
 \begin{code}
 primitiveCompareWith
@@ -974,8 +992,8 @@ primitiveCompareWith
 				[:str :index | objectMemory fetchByte: (objectMemory fetchByte: index ofObject: str) + 1 ofObject: order ]].
 
 	self methodReturnInteger: result
-
-
+\end{code}
+\begin{code}
 rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBlock: accessBlock
 	| c1 c2 min |
 	<inline: true> "needs to be forced else slang does not inline it by default"
@@ -987,11 +1005,10 @@ rawCompare: string1 length: strLength1 with: string2 length: strLength2 accessBl
 	^strLength1 - strLength2
 \end{code}
 
-\vfill\null %switch column
+\cba{Source code et generated C code et generated ASM code}
+
 \section{Cog's RTL code}
 \label{RTLAppendix}
-
-Source code of the method generating the native code of the string comparison primitive on top of Cog's RTL. Method names starting with uppercase (in blue) are directly generating an abstract assembly instruction. Other methods called, starting with gen, generate a sequence of abstract assembly instructions. We duplicated the code checking if each operand is a ByteString and extract its size to generate better native code than doing the two operations separatedly.
 
 \begin{code}
 genPrimitiveStringCompareWith
@@ -1032,9 +1049,6 @@ genPrimitiveStringCompareWith
 	(cogit LogicalShiftLeftCq: objectMemory shiftForWord R: string2CharOrByteSizeReg).
 	cogit AndCq: objectMemory wordSize - 1 R: TempReg R: TempReg.
 	cogit SubR: TempReg R: string2CharOrByteSizeReg.
-	\end{code}
-	\vfill\null %switch column
-	\begin{code}
 	"Type and number of arguments are correct"
 	"Compute the min"	 
 	cogit CmpR: string1CharOrByteSizeReg R: string2CharOrByteSizeReg.
@@ -1067,5 +1081,7 @@ genPrimitiveStringCompareWith
 				jmpTarget: (jumpIncorrectFormat1 jmpTarget: cogit Label))).
 	^ CompletePrimitive}
 \end{code}
+
+\cba{Source code et generated ASM code}
 
 \end{document}
