@@ -202,7 +202,7 @@ Section \ref{sec:implContext} describes our implementation context, \emph{i.e.,}
 \section{Implementation context}
 \label{sec:implContext}
 
-Our evaluation is based on the Cog VM a Smalltalk virtual machine. The Cog VM is based on Dan Ingalls' Smalltalk VM \cite{BackToTheFuture} and \sd{has} have been enhanced with a JIT \cite{CogJIT} compiling one method or closure at a time to native code. Historically, the VM implemented a 32-bits adaptation of the Smalltalk-80 specifications \cite{blueBook}, but the Cog VM is now the default VM for multiple programming languages such as Pharo \cite{PharoByExample}, Squeak \cite{SqueakByExample} and Newspeak \cite{NewspeakOopsla}.
+Our evaluation is based on the Cog VM a Smalltalk virtual machine. The Cog VM is based on Dan Ingalls' Smalltalk VM \cite{BackToTheFuture} and has been enhanced with a JIT \cite{CogJIT} compiling one method or closure at a time to native code. Historically, the VM implemented a 32-bits adaptation of the Smalltalk-80 specifications \cite{blueBook}, but the Cog VM is now the default VM for multiple programming languages such as Pharo \cite{PharoByExample}, Squeak \cite{SqueakByExample} and Newspeak \cite{NewspeakOopsla}.
 
 Section \ref{sec:VMCompil} describes briefly the implementation languages and compilation process of the Cog VM. Section \ref{sec:VMexec} explains briefly the hybrid execution model with an interpreter and a JIT. In Section \ref{sec:primExec}, we detail how primitives are executed. Section \ref{subsec:primSpec} discusses the string comparison primitive specifications  used for our evaluation.
 
@@ -793,7 +793,7 @@ This difference is mainly due to the optimizations performed by both the compile
 \begin{figure*}[htp!]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop \cba{I would like another column with comments, what does each line do. I need some different representation, no addresses, labels for jumps, something standard would be nice. Ca peut être un truc comme dans ce papier que j'ai fait https://hal.archives-ouvertes.fr/hal-01356338 mais c'est pas super fou, sinon dans la these de Urs http://www.cs.ucsb.edu/~urs/oocsb/self/papers/urs-thesis.html , par ex page 61, il y a une autre facon de faire qui est mieux}}
+		\caption{GCC and LLVM: different optimizations on the comparison loop}
 		\label{fig:Asm}
 \end{figure*}
 
