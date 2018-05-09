@@ -72,7 +72,7 @@
 \newcommand{\sd}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Stef:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\sk}[1]{\color{blue}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\cba}[1]{\color{purple}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
-\newcommand*\rot{\rotatebox{90}}
+%\newcommand*{rotatebox{75}}
 \input{macros}
 
 \begin{document}
@@ -321,40 +321,41 @@ The Slang implementation is written inside the interpreter and has access to all
 In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is greater, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator. Since only performance critical implementations matter in this context, we've re-implemented only the case where there is 2 parameters. For the three parameter primitive, the VM falls-back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
  \subsection{Comparison}
- 
- \todo{Finish section}
- 
- In this section we compare the five different implementations according to the following criteria:
- \begin{itemize} 
- 	\item \emph{Recompilation needed:} Diff no, plugin, full
-	\item \emph{Implementation language familiar to developers:} Merged the 2 latter, explain ST dev ST, VM dev ST-Slang-C-ASM, maybe result is + ou - ? or + or 0
-	\item \emph{Readability:} explain why number of lines of code. 
-	\item \emph{Number of implementations to maintain:} explain fall-back code which is in all languages, Slang/C, JIT => maybe we ignore the fall-back code ?
-	\item \emph{Stack switch from generated native code:} 
-	\item \emph{Optimization potential:} discuss inlining C comp cross file and InterpreterProxy indirection
-	\item \emph{Control over the generated code:} diff llvm gcc while JIT always the same
-\end{itemize}
 
-\begin{table}
+\begin{table*} [bth]
 \centering
 \begin{tabular}{lccccccc}
   \hline
-    & \rot{recompilation needed} & \rot{familiar to client dev} & \rot{familiar to vm dev} & \rot{number of LoC} & \rot{Implementations to maintain} & \rot{Performance} & \rot{Control over generated code} \\
+    & Recompilation & Familiar to & Lignes & Number of & Stack switch & Optimization & Code generation \\
+    & required & developers & of code & implementations & overhead & potential & control \\
   \hline
-  Baseline    &             & \checkmark  &            & 10  & 3+ &  +  &  \\
+  Baseline    & No & All  & 10  & 0 & No & - & - \\
    \hline
-  SmartSyntax &             &  \checkmark &            & 20  & 3+ & ++  & -\\
+  SmartSyntax & Plugin & VM & 20  & 3+ & Yes  & Limited & Low \\
    \hline
-  SlangPlugin &             &  \checkmark &            & 35  & 2  & ++  & - \\
+  SlangPlugin & Plugin & VM & 35  & 1  & Yes & Limited & Low \\
    \hline
-  PureSlang   & \checkmark  &             & \checkmark & 45  & 1  & ++  & -\\
+  PureSlang   & Yes  & VM & 45  & 1  & Yes & High & Low \\
    \hline
-  Slang+JIT   & \checkmark  &             & \checkmark & 85  & 1  & ++++ & + \\
+  Slang+JIT   & Yes  & VM-JIT & 85  & 2  & No & High & Full \\
   \hline
 \end{tabular}
-\caption{Trade-offs between implementations: summarized}
+\caption{Comparison between implementations\vspace{-0.5cm}}
 \label{tab:cmp_implem}
-\end{table}
+\end{table*}
+
+ In this section we compare the five different implementations according to the following criteria:
+ \begin{itemize} 
+ 	\item \emph{Recompilation required:} Changing the implementation requires only Smalltalk bytecode recompilation (No), requires to recompile a plugin to a dynamic library if compiled as external or the recompilation of the full VM if compiled as internal (-) or requires to recompile the full VM (Yes).
+	\item \emph{Implementation language familiar to developers:} Smalltalk application developers are considered to be familiar with Smalltalk only, while Cog VM developers are considered being familiar with Smalltalk, Slang, C and Assembly code. Only Cog's JIT implementors are familiar with its RTL, which is a subset of the VM developers.  We use \emph{All} if all communities are familiar with the language, \emph{VM} if all VM developers are and \emph{VM-JIT} if only a subset of VM developers are. 
+	\item \emph{Readability:} To evaluate the readability of the approach, we use one of the most used metric, the number of lines of code.
+	\item \emph{Number of implementations to maintain:} In each case, the client language has to implement a fall-back code in Smalltalk to execute if the primitive fails. This code is maintain by the client language implementors, and not by the VM implementors. Hence we do not count the fall-back code in the number of implementation to maintain, nor the pure Smalltalk implementation. However, as a VM implementor, we need to maintain what generates the C code of the VM, hence, in the case of Smart Syntax, we need to maintain a different method in each client language. We also count all the Slang implementations as well as the ones on Cog's RTL.
+	\item \emph{Stack switch overhead:} Yes if activating the primitive from the native code generated by the JIT requires to switch between the C and the client stack, inducing execution time overhead.
+	\item \emph{Optimization potential:} \todo{}
+	discuss inlining C comp cross file and InterpreterProxy indirection
+	Smalltalk we control indirectly.
+	\item \emph{Control over the generated code:} \todo{}diff llvm gcc while JIT always the same
+\end{itemize}
 
 One or another implementation could be preferred depending on the intended aim: the main trade-off will be found between the engineering time and the performance. Table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time may tend to increase when more low-level languages are used, such as Cog's RTL for instance.
 Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins may bring modularity, but as you will see in Section \ref{sec:eval}, the performance, although better than baseline version, could still be improved.
@@ -783,19 +784,18 @@ We can draw the following patterns from these results:
 the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
 \end{itemize} 
 
+\begin{figure*}[bth]
+		\centering
+		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
+		\caption{GCC and LLVM: different optimizations on the comparison loop}
+		\label{fig:Asm}
+\end{figure*}
 
 However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
 This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
 \sk{parler des autres optis qui n'ont pas d'impact négatif sur le temps d'exec ? ou le conserver pour les future work pour des potentielles améliorations?}
-
-\begin{figure*}[htp!]
-		\centering
-		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop}
-		\label{fig:Asm}
-\end{figure*}
 
 \section{Discussion and related work}
 
@@ -852,8 +852,11 @@ In this paper we compare five different implementations of the string primitives
 %% Bibliography
 \bibliography{sista,rmod}
 
+\vspace{10cm} %Adapt to make vfill work
+
 %% Appendix
-\vfill\null %switch column
+\null \vfill\null %switch column
+
 \appendix
 \section{Smart Syntax code}
 \label{SmartSyntaxAppendix}
