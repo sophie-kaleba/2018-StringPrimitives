@@ -68,6 +68,7 @@
 %\input{macros.tex}
 
 \usepackage{xcolor}
+\newcommand{\todo}[1]{\color{orange}\fbox{\bfseries\sffamily\scriptsize TODO:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\sd}[1]{\color{red}\fbox{\bfseries\sffamily\scriptsize Stef:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\sk}[1]{\color{blue}\fbox{\bfseries\sffamily\scriptsize Sophie:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
 \newcommand{\cba}[1]{\color{purple}\fbox{\bfseries\sffamily\scriptsize Clement:}{\sf\small$\blacktriangleright$\textit{#1}$\blacktriangleleft$}\color{black}}
@@ -321,6 +322,8 @@ In addition to the previous implementation, we've re-implemented here the primit
 
  \subsection{Comparison}
  
+ \todo{Finish section}
+ 
  In this section we compare the five different implementations according to the following criteria:
  \begin{itemize} 
  	\item \emph{Recompilation needed:} Diff no, plugin, full
@@ -369,8 +372,11 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 
 \paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
+\todo{Add methodology section}
 \cba{Methodology section is missing here: each bench was run x times, each time being y comparison. We removed the loop overhead in the measurements. }
 \cba{+ we bench only = strings, which could make a difference on the plugin version (one less branch) - maybe we should change to number of character compared instead of string size so it does not imply the string are equals.}
+
+\todo{Add exact results}
 \cba{We are also missing exact results, aside from the graphs I usually expect a table with exact results and error margins... That's why the plot is often generated from a file, the table can reuse the same file and you can re-do your bench without changing the latex code. Cf https://hal.inria.fr/hal-01596321/document page 9, it would be nice here to have a similar table below the benchs}
 
 \subsection{Micro-benchmarks}
@@ -790,7 +796,7 @@ This difference is mainly due to the optimizations performed by both the compile
 
 \section{Discussion and related work}
 
-\cba{Maybe talk in those cases the number of representation of the primitives}
+\cba{Maybe talk in those cases the number of representation of the primitives, this is a bit disconnected with the rest of the paper I feel}
 
 We identified two directly related works. In some languages (Strongtalk, Self, RSqueak), the implementors tried to decrease the overall number of optional primitives by improving the client language performance, reducing the need for such primitives \cite{Strongtalk, ursPHD, NoPrimTracing}. In addition, in the V8 project  \cite{V8}, the interpreter was entirely built on top of the V8 JIT's back-end using a specific DSL similar to Cog's RTL.
 
@@ -807,11 +813,15 @@ To avoid paying the stack switch cost between the client Stack and the C stack, 
 In our context, implementing a similar approach would require us to compile Slang to native code through our JIT compiler back-end or to rewrite the interpreter on top of Cog JIT's RTL. Slang has some abstractions over native code, similarly to C. Compiling Slang ahead of time to native code efficiently requires us to re-implement optimizations implemented in C compilers and we don't want that complexity or to lower the abstractions level of Slang to express native code optimizations, which would increase the complexity of Slang, which we don't want either. Rewriting the interpreter on top of Cog JIT's RTL is possible but requires a significant amount of work.
 
 \section{Future work and conclusion}
-1. number of representations\\
-2. common representation
+\todo{Write section}
+
+\paragraph{Future work.}
 \cba{Future work -> primitive processor dependent (i.e. SSE4 instrs), pros and cons and why you did not do it (ingeniering cost per back-end)}
 \cba{Inlining in Sista + ref}
 \cite{SistaFastStartUp}
+
+1. number of representations\\
+2. common representation
 
 Conclusion: trade off expressiveness performance
 
@@ -837,7 +847,7 @@ Conclusion: trade off expressiveness performance
 %% Bibliography
 \bibliography{sista,rmod}
 
-
+\todo{Add some intro sentence here and there + maybe ASM in appendix}
 %% Appendix
 \appendix
 \section{Smart Syntax code}
