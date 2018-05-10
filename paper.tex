@@ -851,7 +851,7 @@ As mentionned in Section \ref{sec:VMexec}, all implementations written in Slang 
 As the string size goes larger, the overhead is less significant because it is **absorbed** by other performance gains.
 Regarding this criteria, the Slang+JIT version is always the fastest: it is not really impacted by the switch overhead, because the Slang part is used for a very short time.
 
-\paragraph{Optimization potential OR Large strings comparison performance}
+\paragraph{Optimization potential on large strings comparison}
 The plugins come with an overhead due to the cross-file inlining and the passage through an InterpreterProxy, like said in Section \ref{sec:implem_cmp}. This is one of the factor explaining the performance gap between these versions and the Slang and Slang+JIT ones.
 When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure \ref{fig:Asm}). However, the switch overhead is still noticeable in the PureSlang implementation when strings of 100 characters are compared: PureSlang is 15.8 times faster while Slang+JIT is 16.8 times faster. This is not the case anymore on 1000-characters strings.
 This last observation only applies to the GCC results. The LLVM version 
