@@ -346,6 +346,7 @@ In addition to the previous implementation, we've re-implemented here the primit
 \label{tab:cmp_implem}
 \end{table*}
 
+\cba{We may use paragraph instead of itemize here to compact}
  In this section we compare the five different implementations according to the following criteria:
  \begin{itemize}
  	\item \emph{Recompilation required:} Changing the implementation requires only Smalltalk bytecode recompilation (No), requires to recompile a plugin to a dynamic library if compiled as external or the recompilation of the full VM if compiled as internal (-) or requires to recompile the full VM (Yes).
@@ -821,11 +822,11 @@ x   y           error
 \end{figure*}
 
 In each benchmark, we run a string comparison in a loop and measure the total execution time.
-The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). This addresses the warm-up of the JIT and allows the benchmarks to run at least 1 second in the slower implementations.
+The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). This addresses the warm-up of the JIT \cba{??? This needs to be explained differently. We get into jitted code after a small number of loop iteration (I think 20 currently) or second call. The JIT overhead is negligible here for 1 second because we could not see any time spent in the JIT in the profiler + ref to your paper, i.e. less than 0.5ms in the JIT} and allows the benchmarks to run at least 1 second in the slower implementations \cba{Ok, 1 second to avoid processor noises}.
 The loop overhead is measured and removed from the measurements.
 
-The 2 compared strings are equal as it corresponds to the worst scenario for most of our benched implementations \footnote{There is one branch less in the SlangPlugin implementation in this case}.  
-
+The 2 compared strings are equal as it corresponds to the worst scenario for most of our benched implementations. There is one less branch in the two plugin implementations in this case.
+I
 \subsection{Micro-benchmarks}
 
 %\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
@@ -837,6 +838,12 @@ We can draw the following patterns from these results:
 \item The Slang+JIT implementation is more efficient in every case. Nevertheless,
 the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
 \end{itemize}
+
+\cba{We need to explain: small string, overhead stack switch high, baseline and JIT version fastest. Large string, loop is where the time is spent, slang and JIT fastest.
+We need size 1000 so that the stack switch overhead cannot be seen anymore on gcc (size 100 we still C it)
+Size 0 is only '' = '', not really interesting in real app, but show well the stack switch overhead.
+Example use cases are comparing tokens in parsers (Size ~4-10 [self, super, thisContext, this, etc.])
+Other example are long urls, hundreds of characters, which are represented with large string comp bench}
 
 However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
