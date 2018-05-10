@@ -322,7 +322,8 @@ The Slang implementation is written inside the interpreter and has access to all
 
 In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is greater, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator. Since only performance critical implementations matter in this context, we've re-implemented only the case where there is 2 parameters. For the three parameter primitive, the VM falls-back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
- \subsection{Comparison}
+\subsection{Comparison}
+\label{sec:implem_cmp}
 
 \begin{table*} [bth]
 \centering
@@ -829,41 +830,69 @@ The number of iterations of the loop depends on the string size: the comparison 
 The loop overhead is measured and removed from the measurements.
 
 The 2 compared strings are equal as it corresponds to the worst scenario for most of our benched implementations. There is one less branch in the two plugin implementations in this case.
-I
+
 \subsection{Micro-benchmarks}
 
 %\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
 We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters, using two different compilers: GCC on one hand and LLVM on the other hand. Figure \ref{fig:bench} show the results in terms of relative speed-up towards the baseline implementation, respectively for GCC and LLVM.
 
+
 We can draw the following patterns from these results:
 \begin{itemize}
-\item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in Section \ref{sec:VMexec}.
-\item The Slang+JIT implementation is more efficient in every case. Nevertheless,
-the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
+\item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings.
+\item The Slang+JIT implementation is more efficient than the baseline in every case. Nevertheless,the performance gap between this version and the PureSlang one tends to decrease as the string size increases. 
+\item The compiler used (either GCC or LLVM) does not lead to significant differences in terms of performance, except for the 100+-characters strings. 
 \end{itemize}
 
-\todo{Following comments are the most important for paper}
+We can explain these results based on the last 3 criteria detailed in Section \ref{sec:implem_cmp}:
 
-\cba{we had 3 criterias:
-- 1 C ST stack switch overhead. 
-- 2 optimization potential, that we may change to large string cmp perf
-- 3 control over generated code
-We need to explain the results based on each criteria, ideally in 3 paragraphs entitled with the 3 criteria.
-The 2 paragraph below explain only point 3 and lacks a conclusion sentence "blabla we have control and if C compiler is not good such as uncommon back-end or x86 which is still quite common in this case..."
-}
-\cba{This is the kind of missing things: C ST stack switch overhead: small string, overhead stack switch high, baseline and JIT version fastest. 
-Large string perf: Large string, loop is where the time is spent, slang and JIT fastest.
-We need size 1000 so that the stack switch overhead cannot be seen anymore on gcc (size 100 we still C it)}
+\paragraph{Stack switch overhead}
+As mentionned in Section \ref{sec:VMexec}, all implementations written in Slang come with an overhead due to the switch between the C and Smalltalk stacks. This overhead is clearly visible in the bench results in Figure \ref{fig:bench} for small strings (size 1 or less): the SmartSyntax and Plugin implementations are around 30 to 60\% slower than the baseline's, and the PureSlang performances are close to the baseline's.
+As the string size goes larger, the overhead is less significant because it is **absorbed** by other performance gains.
+Regarding this criteria, the Slang+JIT version is always the fastest: it is not really impacted by the switch overhead, because the Slang part is used for a very short time.
 
-\cba{Maybe small discussion on relevance
-Size 0 is only '' = '', not really interesting in real app, but show well the stack switch overhead.
-Example use cases are comparing tokens in parsers (Size ~4-10 [self, super, thisContext, this, etc.])
-Other example are long urls, hundreds of characters, which are represented with large string comp bench
-or something like that.}
+\paragraph{Optimization potential OR Large strings comparison performance}
+The plugins come with an overhead due to the cross-file inlining and the passage through an InterpreterProxy, like said in Section \ref{sec:implem_cmp}. This is one of the factor explaining the performance gap between these versions and the Slang and Slang+JIT ones.
+When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure \ref{fig:Asm}). However, the switch overhead is still noticeable in the PureSlang implementation when strings of 100 characters are compared: PureSlang is 15.8 times faster while Slang+JIT is 16.8 times faster. This is not the case anymore on 1000-characters strings.
+This last observation only applies to the GCC results. The LLVM version 
 
-However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
-This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
+\paragraph{Control over generated code}
+One could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
+
+This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm}, GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at preserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
+
+
+
+%We can draw the following patterns from these results:
+%\begin{itemize}
+%\item The execution time of the SmartSyntax and Plugin implementations is either very close or greater than the baseline's for the small strings. This can be explained by the high cost of the switching between the C and Smalltalk stacks, as mentionned in Section \ref{sec:VMexec}.
+%\item The Slang+JIT implementation is more efficient in every case. Nevertheless,
+%the performance gap between this implementation and the PureSlang one tends to decrease as the string size increase. The comparison loop (\ref{fig:Asm}) proves to be more and more time-consuming because of the higher number of iterations.
+%\end{itemize}
+%
+%\todo{Following comments are the most important for paper}
+%
+%\cba{we had 3 criterias:
+%- 1 C ST stack switch overhead. 
+%- 2 optimization potential, that we may change to large string cmp perf
+%- 3 control over generated code
+%We need to explain the results based on each criteria, ideally in 3 paragraphs entitled with the 3 criteria.
+%The 2 paragraph below explain only point 3 and lacks a conclusion sentence "blabla we have control and if C compiler is not good such as uncommon back-end or x86 which is still quite common in this case..."
+%}
+%\cba{This is the kind of missing things: C ST stack switch overhead: small string, overhead stack switch high, baseline and JIT version fastest. 
+%Large string perf: Large string, loop is where the time is spent, slang and JIT fastest.
+%We need size 1000 so that the stack switch overhead cannot be seen anymore on gcc (size 100 we still C it)}
+%
+%\cba{Maybe small discussion on relevance
+%Size 0 is only '' = '', not really interesting in real app, but show well the stack switch overhead.
+%Example use cases are comparing tokens in parsers (Size ~4-10 [self, super, thisContext, this, etc.])
+%Other example are long urls, hundreds of characters, which are represented with large string comp bench
+%or something like that.}
+%
+%However, one could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, we notive in Figure \ref{fig:bench} that the performances between the PureSlang and Slang+JIT implementations are really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet they greatly differ when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
+%
+%This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure \ref{fig:Asm} GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at perserving the registries holding the strings (edi and esi), leading to 2 extra instructions (bolded in the figure) that will load the strings at each iteration.
 
 \section{Discussion and related work}
 
