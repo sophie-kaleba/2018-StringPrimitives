@@ -69,6 +69,11 @@ Adele Goldberg and David Robson.
 \newblock {\em {Smalltalk-80: The Language and Its Implementation}}.
 \newblock Addison-Wesley Longman Publishing Co., Inc., Boston, MA, USA, 1983.
 
+\bibitem[GR01]{Guzd01b}
+Mark Guzdial and Kim Rose.
+\newblock {\em Squeak --- Open Personal Computing and Multimedia}.
+\newblock Prentice-Hall, 2001.
+
 \bibitem[H\"94]{ursPHD}
 Urs H\"olzle.
 \newblock {\em Adaptive optimization for {S}elf: reconciling high performance
