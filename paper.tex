@@ -133,9 +133,9 @@
 
 Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional: they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
 
-In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++), or on top of the just-in-time compiler back-end. This raises the questions of the tradeoffs of the different alternatives. We implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine.
+In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++), or on top of the just-in-time compiler back-end. This raises the question of the tradeoffs of the different alternatives. As a case study, we implemented the String comparison optional primitive in each case. This paper describes the different implementations and compares the execution time in Cog, a Smalltalk virtual machine.
 
-Without surprise, the paper shows that the implementation with the most reliable and high performance is also the most complex and difficult to implement. Since hundreds of optional primitives could be wished, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
+Without surprise, the paper shows that the implementation with the most reliable and highest performance is also the most complex and difficult to implement. Nevertheless, since hundreds of optional primitives could be wished, the virtual machine implementor has to carefully choose how to implement each of them to balance between maintenance cost and high performance.
 \end{abstract}
 
 %% 2012 ACM Computing Classification System (CSS) concepts
@@ -183,16 +183,19 @@ On top of its virtual machine, the client language can use a set of \emph{primit
 	\item \emph{Optional primitives} exist only to make the system run faster \cite{blueBook}. They can be implemented in the client language directly, making its implementation as a primitive optional, but they are often implemented directly in the VM to improve performance.
 \end{itemize}
 
+
+\paragraph{Optional primitives as client code.}
 The implementation of an optional primitive in the VM rather than the client language improves performance but also often increases the implementation engineering cost. For example, accessing objects in the VM usually requires understanding of the memory layout or implementation details, which are not needed in the client language.
 
-For this reason, some virtual machine implementors attempted to remove most or all optional primitives. Their goal was to use a JIT performing speculative optimizations to be able to implement the optional primitives in the client language without performance loss. Ideally we wanted to get   the performance of the same primitives written in the VM. Self \cite{ursPHD} and Strongtalk \cite{Strongtalk} were the first to try this approach. Early versions of the Javascript engine V8 \cite{V8} also implemented most of the primitives, including for example Array operations in Javascript itself. However, without optional primitives implemented in the VM, several problems rise:
+For this reason, some virtual machine implementors attempted to remove most or all optional primitives. Their goal was to use a JIT performing speculative optimizations to be able to implement the optional primitives in the client language without performance loss. Ideally they wanted to get   the performance of the same primitives written in the VM. Self \cite{ursPHD} and Strongtalk \cite{Strongtalk} were the first to try this approach. Early versions of the Javascript engine V8 \cite{V8} also implemented most of the primitives, including for example Array operations in Javascript itself. However, without optional primitives implemented in the VM, several problems rise:
 \begin{itemize}
-	\item High performance relies on a JIT with speculative optimizations, which is hard to implement, maintain and evolve,
-	\item The performance of the code not yet optimized is much worse than the peak performance code,
-	\item Even mature JIT fail to optimize some narrow cases, where the performance is drastically slower.
+	\item High performance relies on a JIT with speculative optimizations, which is hard to implement, maintain and evolve.
+	\item The performance of the code not yet optimized is much worse than the peak performance code \sd{I did not really get it. indeed non optimized code is slower than optimized code. So what?}.
+	\item Even mature JITs fail to optimize some narrow cases, where the performance is drastically slower. \sd{do you have a ref?}
 \end{itemize}
 Overall, this approach requires high engineering time to get a mature optimizing JIT with speculative optimizations and even then, it leads in practice to unreliable performance.
 
+\paragraph{World border cost.}
 VMs are traditionally implemented in a low-level language such as C or C++. To balance between memory footprint, start-up performance and peak performance, the execution of code is usually done through multiple execution tiers: the first few executions of a code snippet are done through an interpreter and the JIT compiler optimizes at runtime the frequently used code snippets.
 
 This leads to annoying concerns: for example, let's say we implement a primitive in C. Frequently used portion of code calling that primitive are going to be compiled to native code by the JIT. This is problematic since the native code generated by the JIT is not directly compatible with native code generated by the C compiler: a call from one to another may require to edit the stack pointer and the frame pointer from the client stack to the C stack and to spill or move multiple registers. Switching between both usually wastes up to around a dozen native instructions. If the primitive is going to execute many instructions, the switch overhead might be negligible, but if the primitive executes only a few instructions, the overhead can be noticeable.
@@ -201,14 +204,15 @@ This leads to annoying concerns: for example, let's say we implement a primitive
 
 In this paper, we take the example of a string comparison optional primitive. The primitive compares two strings and answers if one string is greater, equal or lower than the other string. The exact specifications are detailed in Section \ref{subsec:primSpec}. We implemented a first version in Pharo/Smalltalk. We then implemented multiple version compiling through C compilers to native code, using different part of our VM infrastructure. Lastly, we implemented a version in the back-end of the JIT. Each time, we tried to write the code in the most efficient way possible. Then, we compared the execution time of all versions, showing that overall the most complex implementation is the fastest to execute.
 
-Section \ref{sec:implContext} describes our implementation context, \emph{i.e.,} the execution model of the VM we used for our evaluation, how it executes primitives and the specification of our string comparison primitive. Section \ref{sec:implem} details the various implementations of the primitive we used for the evaluation. In Section \ref{sec:eval}, we evaluate the performance of the different implementations with different C compilers and string sizes. We also show the native code of the performance critical part of the primitive generated by each version and discuss it. Further sections compare our work to related works, discuss future work and conclude.
+Section~\ref{sec:implContext} describes our implementation context, \emph{i.e.,} the execution model of the VM we used for our evaluation, how it executes primitives and the specification of our string comparison primitive. Section~\ref{sec:implem} details the various implementations of the primitive we used for the evaluation. In Section~\ref{sec:eval}, we evaluate the performance of the different implementations with different C compilers and string sizes. We also show the native code of the performance critical part of the primitive generated by each version and discuss it. Further sections compare our work to related works, discuss future work and conclude.
 
 \section{Implementation context}
 \label{sec:implContext}
 
-Our evaluation is based on the Cog VM a Smalltalk virtual machine. The Cog VM is based on Dan Ingalls' Smalltalk VM \cite{BackToTheFuture} and has been enhanced with a JIT \cite{CogJIT} compiling one method or closure at a time to native code. Historically, the VM implemented a 32-bits adaptation of the Smalltalk-80 specifications \cite{blueBook}, but the Cog VM is now the default VM for multiple programming languages such as Pharo \cite{PharoByExample}, Squeak \cite{SqueakByExample} and Newspeak \cite{NewspeakOopsla}.
+Our evaluation is based on the Cog VM: a Smalltalk virtual machine. The Cog VM is based on Dan Ingalls' Smalltalk VM \cite{BackToTheFuture} and has been enhanced with a JIT \cite{CogJIT} compiling one method or closure at a time to native code. Historically, the VM implemented a 32-bits adaptation of the Smalltalk-80 specifications \cite{blueBook}, but the Cog VM is now the default VM for multiple programming languages such as Pharo \cite{PharoByExample}, Squeak \cite{SqueakByExample} and Newspeak \cite{NewspeakOopsla}.
 
-Section \ref{sec:VMCompil} describes briefly the implementation languages and compilation process of the Cog VM. Section \ref{sec:VMexec} explains briefly the hybrid execution model with an interpreter and a JIT. In Section \ref{sec:primExec}, we detail how primitives are executed. Section \ref{subsec:primSpec} discusses the string comparison primitive specifications  used for our evaluation.
+Section~\ref{sec:VMCompil} describes briefly %\sd{no it does not describe that: the implementation languages and}
+the compilation process of the Cog VM. Section~\ref{sec:VMexec} explains briefly the hybrid execution model with an interpreter and a JIT. In Section~ \ref{sec:primExec}, we detail how primitives are executed. Section~\ref{subsec:primSpec} discusses the string comparison primitive specifications  used for our evaluation.
 
 \subsection{VM compilation}
 \label{sec:VMCompil}
@@ -231,7 +235,8 @@ The executable is generated in two steps as shown on Figure~\ref{fig:VMCompilati
 \cba{We need to introduce here the concept of VM plugin and interpreterproxy indirection/overhead. This is very important since later we just say this is a plugin and we don't redefine it}
 \sk{done but someone better check what I wrote :-)}
 
-VM plugins enable the addition of new features to the VM. There are 2 types of plugins: the built-ins and the externals.
+Cog VM can be extended using plugins \cite{Guzd01b}.
+VM plugins enable the addition of new features to the VM. There are 2 types of plugins:  the external and the  built-ins ones.
 \begin{itemize}
 \item \emph{External plugins:} Plugins that can be added or removed from the VM without the need to recompile the VM sources.
 \item \emph{Internal plugins:} Plugins that cannot be installed without recompiling the VM sources. However, these plugins can reach some parts of the VM internals\footnote{as data structures, routines...} that remains unreachable from an external plugin. These operations are performed via an InterpreterProxy. Although, this solution results in a substential overhead if called often. \cba{Remove from paper InterpreterProxy}
@@ -252,7 +257,7 @@ The VM code, including the interpreter code, is compiled by a C compiler and use
 		\label{fig:TwoStacks}
 \end{figure}
 
-Because of this design, switching the execution between the interpreter and the native code generated by the JIT has a cost. Effectively, the VM needs to switch the frame pointer, the stack pointer and depending on architecture the link register from one stack to the other one. It also needs to save those pointers to be able to resume execution from one stack to the other one. In addition, caller-saved registers on the C conventions or the JIT convention need to be saved since the VM cannot tell ahead what code is going to be used in the other execution model and what registers are required. We estimate the overhead to up to around a dozen of processor instruction, the exact number varies a lot so it is difficult to precise it (the number of register to edit depends on the processor and on the code executed).
+Because of this design, switching the execution between the interpreter and the native code generated by the JIT has a cost. Effectively, the VM needs to switch the frame pointer, the stack pointer and depending on architecture the link register \sd{I do not get "the link register"} from one stack to the other one. It also needs to save those pointers to be able to resume execution from one stack to the other one. In addition, caller-saved registers on the C conventions or the JIT convention need to be saved since the VM cannot tell ahead what code is going to be used in the other execution model and what registers are required. We estimate the overhead to up to around a dozen of processor instruction, the exact number varies a lot so it is difficult to precise it (the number of register to edit depends on the processor and on the code executed).
 
 Most of the primitives are implemented either in Slang or directly in C. They benefit from the C compiler optimizations to be efficient. When called from the interpreter, activating a primitive is just a C call (the primitive function pointer is cached in the look-up cache next to the method to activate). When called from the native code generated by the JIT, activating a primitive requires to switch the execution from the client stack to the C stack, perform the primitive, and switch back to resume execution. If the primitive takes a significant amount of instructions to execute, for example, the primitive is copying 100kb from one array to another one, the stack switch dance overhead is negligible. If the primitive is very quick to perform, for example, the primitive is adding two integers which do not overflow, the overhead is massive: the execution cost of the addition goes from a few processor instructions to a few dozen instructions.
 
@@ -271,7 +276,7 @@ The primitives can be associated either with a name, either with an index in the
 \label{subsec:primSpec}
 
 \cba{Cette partie je faisais la queue dans la gare en mm temps, a relire}
-
+\sd{je ne suis pas sur que je garderais la specification originale car cela n'apporte pas grand-chose.}
  The primitive specification is a bit tedious to explain, since as we were trying to improve its performance, we had to change the specifications. In this section we describe first the string implementation, then the original primitive specification and why they were problematic and lastly the new specifications.
 
 \paragraph{String representations.} Strings are represented on top of the Cog VM in two possible forms: ByteStrings and WideStrings. ByteStrings encode each character of the string in a single byte. The encoding usually follows the extended ASCII standard. WideStrings encode each character in 32 bits. The encoding usually follows Unicode specifications. In this paper, we will discuss only the implementation of the string comparison primitive for ByteStrings. WideStrings use an implementation entirely implemented in the client language, and so far, it has not been reported as a performance bottleneck for any program of any users. To sort arrays of strings, strings can be compared. They can be compared in the default order (ASCII or Unicode) or using different orders, for example, the case insensitive order.
@@ -291,7 +296,7 @@ In the paper we will focus on the comparison of two strings with the default ASC
 \section{Different primitive implementations}
 \label{sec:implem}
 
- This section first describes the different ways of implementing a primitive. We then explain how each of these versions are executed by the VM and the pros and cons of each and every.
+ This section first describes the different ways of implementing a primitive. We then explain how each of these versions is executed by the VM and the pros and cons of each and every.
 
  \subsection{Different implementations and executions}
 
@@ -948,7 +953,7 @@ In this paper we compare five different implementations of the string primitives
 
 %% Bibliography
 \bibliographystyle{alpha}
-\bibliography{sista,rmod}
+\bibliography{sista,rmod,others}
 
 %\vspace{10cm} %Adapt to make vfill work
 
