@@ -25,11 +25,23 @@ Andrew~P. Black, St\'ephane Ducasse, Oscar Nierstrasz, Damien Pollet, Damien
 \newblock {\em Pharo by Example}.
 \newblock Square Bracket Associates, Kehrsatz, Switzerland, 2009.
 
+\bibitem[Ber17]{Bera17a}
+Clement Bera.
+\newblock {\em Sista: a Metacircular Architecture for Runtime Optimisation
+  Persistence}.
+\newblock PhD thesis, Universit\'e de Lille, 2017.
+
 \bibitem[BMF{\etalchar{+}}17]{SistaFastStartUp}
 Cl{\'e}ment B{\'e}ra, Eliot Miranda, Tim Felgentreff, Marcus Denker, and
   St{\'e}phane Ducasse.
 \newblock Sista: Saving optimized code in snapshots for fast start-up.
 \newblock In {\em Managed Languages and Runtimes}, ManLang 2017, 2017.
+
+\bibitem[BMWB86]{Ball86a}
+Mark~B. Ballard, David Maier, and Allen Wirfs-Brock.
+\newblock Quicktalk: {A} {Smalltalk}-80 dialect for defining primitive methods.
+\newblock In {\em Proceedings OOPSLA '86}, volume~21, pages 140--150, November
+  1986.
 
 \bibitem[BvdAB{\etalchar{+}}10]{NewspeakOopsla}
 Gilad Bracha, Peter von~der Ah{\'e}, Vassili Bykov, Yaron Kashai, William
@@ -47,7 +59,7 @@ Jackson Davis.
 
 \bibitem[DMP16]{Duca16a}
 St\'ephane Ducasse, Eliot Miranda, and Alain Plantec.
-\newblock {Pragmas: Literal Messages as Powerful Method Annotations}.
+\newblock Pragmas: Literal messages as powerful method annotations.
 \newblock In {\em International Workshop on Smalltalk Technologies {IWST'16}},
   Prague, Czech Republic, August 2016.
 
