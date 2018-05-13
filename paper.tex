@@ -191,7 +191,7 @@ For this reason, some virtual machine implementors attempted to remove most or a
 \begin{itemize}
 	\item High performance relies on a JIT with speculative optimizations, which is hard to implement, maintain and evolve.
 	\item The performance of the code not yet optimized is much worse than the peak performance code \sd{I did not really get it. indeed non optimized code is slower than optimized code. So what?}.
-	\item Even mature JITs fail to optimize some narrow cases, where the performance is drastically slower. \sd{do you have a ref?}
+	\item Even mature JITs fail to optimize some narrow cases, where the performance is drastically slower. \sd{do you have a ref?}\sd{clement said: Hotspot paper}
 \end{itemize}
 Overall, this approach requires high engineering time to get a mature optimizing JIT with speculative optimizations and even then, it leads in practice to unreliable performance.
 
@@ -238,7 +238,7 @@ The executable is generated in two steps as shown on Figure~\ref{fig:VMCompilati
 \sk{done but someone better check what I wrote :-)}
 
 Cog VM can be extended using plugins \cite{Guzd01b}.
-VM plugins enable the addition of new features to the VM. There are 2 types of plugins:  the external and the  built-ins ones.
+VM plugins enable the addition of new features to the VM. There are two types of plugins:  the external and the  built-ins ones.
 \begin{itemize}
 \item \emph{External plugins:} Plugins that can be added or removed from the VM without the need to recompile the VM sources.
 \item \emph{Internal plugins:} Plugins that cannot be installed without recompiling the VM sources. However, these plugins can reach some parts of the VM internals\footnote{as data structures, routines...} that remains unreachable from an external plugin. These operations are performed via an InterpreterProxy. Although, this solution results in a substential overhead if called often. \cba{Remove from paper InterpreterProxy}
@@ -255,7 +255,7 @@ The VM code, including the interpreter code, is compiled by a C compiler and use
 \begin{figure}[tbh]
 		\centering
 		\includegraphics[width=0.99\linewidth]{figures/TwoStacks}
-		\caption{Client and C stacks}
+		\caption{Client and C stacks.}
 		\label{fig:TwoStacks}
 \end{figure}
 
@@ -299,8 +299,12 @@ In the paper we will focus on the comparison of two strings with the default ASC
 \label{sec:implem}
 
  This section first describes the different ways of implementing a primitive. We then explain how each of these versions is executed by the VM and the pros and cons of each and every.
+ 
+
 
  \subsection{Different implementations and executions}
+We distinguish several implementations: the first one 
+
 
 \paragraph{Baseline: pure Smalltalk.}
 To evaluate the primitive performance, we use as baseline an implementation in pure Smalltalk. There are multiple ways of writing the comparison of two strings in Smalltalk, following Smalltalk coding conventions, a standard developer would likely use high-level constructs which apply a closure on each element of the strings. We did not use high-level construct and chose to implement the Smalltalk version the most optimized way Smalltalk allows, \emph{i.e.,} we used the constructs to:do: and ifFalse:, which are both recognized by the Smalltalk to bytecode compiler and compiled respectively to loops and branches at the bytecode level. The implementation follows the new specification, hence two methods are available, baselineCompareWith: and baselineCompareWith:order:. Since the focus is only on ASCII ordered comparison, we show the code only of baselineCompareWith:.
@@ -319,7 +323,7 @@ baselineCompareWith: aString
 
 The Smart Syntax Plugin is one of the version \sd{of what} existing until we started this work. The idea behind Smart Syntax is the following: the programmer writes code in Smalltalk using exclusively constructs that are recognized by the Smart Syntax compiler and that can be directly compiled to C (\emph{e.g.}, computing the size of a byte array, accessing its fields and doing integer arithmetic). With the addition of type annotations in the form of pragmas \cite{Duca16a} \footnote{Pragma are method annotation.}, the Smart Syntax plugin is able to generate C code from the Smalltalk code. \sd{A word on QuickTalk \cite{Ball86a}}
 With this approach, the programmer has to write the optional primitive code a single time in Smalltalk. This code is used both as the fall-back code if the VM does not implement the primitive and at Slang to C compilation time to generate a C plugin from the code and the type annotations. This primitive follows the old specification, the full code is available in Appendix~\ref{SmartSyntaxAppendix}.
-\sd{do we have a ref to the quickTalk approach? Because it was like that too if I remember.}
+
 
 
 \paragraph{Existing: Slang Plugin.}
@@ -327,11 +331,11 @@ The Slang plugin is a recent complete rewrite of the Smart Syntax plugin. The ma
 
 \paragraph{Pure Slang.}
 
-The Slang implementation is written inside the interpreter and has access to \sd{sd?full instead all} full interpreter APIs. Since the same primitive index \sd{no idea what is it} is used for the primitive with 2 or 3 arguments, the primitive needs to deal with both cases in a way that the common case is efficient. The primitive is now part of the core of the VM, it cannot be easily added or removed as plugin primitives, but it is simpler to read and write. This primitive follows the new specification, the full code is available in Appendix \ref{SlangAppendix}.
+The Slang implementation is written inside the interpreter and has access to the full interpreter APIs. Since the same primitive index \sd{no idea what is it} is used for the primitive with two or three arguments, the primitive needs to deal with both cases in a way that the common case is efficient. The primitive is now part of the core of the VM, it cannot be easily added or removed as plugin primitives, but it is simpler to read and write. This primitive follows the new specification, the full code is available in Appendix \ref{SlangAppendix}.
 
 \paragraph{Pure Slang with JIT support.}\sd{Why not calling it Slang+RTL}
 
-In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly which \sd{whose?} instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is larger, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator \sd{such as Bosch}. Since only performance critical implementations matter in this context, we've only re-implemented the case where there are two parameters. For the three parameter primitive, the VM falls back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
+In addition to the previous implementation, we've re-implemented here the primitive on top of Cog's JIT back-end. The primitive is written in Cog's RTL, an abstract assembly whose instructions compile almost one-to-one to native instructions. This primitive requires a more important amount of work to be written: the number of line of code is larger, the implementor has to be careful to generate efficient machine code (there is no C compiler to optimize the code) and debugging such code requires the use of a processor simulator \sd{such as Boch}. Since only performance critical implementations matter in this context, we've only re-implemented the case where there are two parameters. For the three parameter primitive, the VM falls back to the Slang version. This primitive follows the new specification, the full code is available in Appendix \ref{RTLAppendix}.
 
 \subsection{Comparison}
 \label{sec:implem_cmp}
@@ -355,7 +359,7 @@ In addition to the previous implementation, we've re-implemented here the primit
   Slang+JIT   & Yes  & VM-JIT & 85  & 2  & No & High & High \\
   \hline
 \end{tabular}
-\caption{Comparison between implementations\vspace{-0.5cm}}
+\caption{Comparison between implementations.\vspace{-0.5cm}}
 \label{tab:cmp_implem}
 \end{table*}
 
@@ -363,7 +367,7 @@ In addition to the previous implementation, we've re-implemented here the primit
  \begin{itemize}
  	\item \emph{Recompilation required:} Changing the implementation requires only Smalltalk bytecode recompilation (No), requires to recompile a plugin to a dynamic library if compiled as external or the recompilation of the full VM if compiled as internal (Plugin) or requires to recompile the full VM (Yes). \sd{why not ST, Plugin, VM?}
 	\item \emph{Implementation language familiar to developers:} Smalltalk application developers are considered to be familiar with Smalltalk only, while Cog VM developers are considered being familiar with Smalltalk, Slang, C and Assembly code. Only Cog's JIT implementors are familiar with its RTL, which is a subset of the VM developers.  We use All if all communities are familiar with the language, VM if all VM developers are and VM-JIT if only a subset of VM developers are.
-	\item \emph{Readability:} To evaluate the approach readability, we use the number of lines of code even if there is no direct link between readability and mere lines of code. \sd{well this is kind of weak. but I do not know what do propose. Cyclomatic complexity counts the number of different exits. And it would be a nice complement}
+	\item \emph{Readability:} To evaluate the approach readability, we use the number of lines of code even if this is arguable but used regularly in other papers \cite{xxx}. A better metric would be to use the cyclomatic complexity, however since the  Cog' s RTL generates branches at runtime, it is difficult to use it.
 	\item \emph{Number of implementations to maintain:} In each case, the client language has to implement a fall-back code in Smalltalk to be executed if the primitive fails. This code is maintained by the client language implementors, and not by the VM implementors. Hence we do not count the fall-back code in the number of implementation to maintain, nor the pure Smalltalk implementation\sd{why?}. However, as a VM implementor, we need to maintain what generates the C code of the VM, hence, in the case of Smart Syntax, we need to maintain a different method in each client language. We also count all the Slang implementations as well as the ones on Cog's RTL.
 	\item \emph{Stack switch overhead:} Yes if activating the primitive from the native code generated by the JIT requires to switch between the C and the client stack, inducing execution time overhead.
 	\item \emph{Optimization potential:} \cba{need to mention that this is for large strings}
@@ -373,8 +377,6 @@ In addition to the previous implementation, we've re-implemented here the primit
 
 One or another implementation could be preferred depending on the intended aim: the main trade-off is between  engineering time and  performance. Table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time tends to increase when more low-level languages are used, such as Cog's RTL for instance.
 Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins brings modularity, but as you will see in Section~\ref{sec:eval}, the performance, although better than baseline version, could still be improved.
-
-\cba{In this section somewhere we need to say that criteria are split in maintenance and performance, the evaluation in next section is on last three criteria: Stack switch overhead, Optimization potential and control over the generated code.}
 
 \section{Evaluation}
 \label{sec:eval}
@@ -824,14 +826,14 @@ x   y           error
   \hline
 \end{tabular} 
 \vspace{0.2cm}
-\caption{Benchmark results with standard errors. Average relative speed-up regarding baseline}
+\caption{Benchmark results with standard errors. Average relative speed-up regarding baseline.}
 \label{tab:detail_bench}
 \end{table*}
 
 \begin{figure*}[b!]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop}
+		\caption{GCC and LLVM: different optimizations on the comparison loop.}
 		\label{fig:Asm}
 \end{figure*}
 
@@ -862,12 +864,12 @@ Regarding this criteria, the Slang+JIT version is always the fastest: it is not 
 
 \paragraph{Optimization potential on large strings comparison.}
 The plugins come with an overhead \sk{not an overhead when it comes to inlining. Just not optimized. need rephrasing} due to the cross-file inlining and the passage through an InterpreterProxy, like said in Section~\ref{sec:implem_cmp}. This is one of the factor explaining the performance gap between these versions and the Slang and Slang+JIT ones.
-When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure~\ref{fig:Asm}). However, the switch overhead is still noticeable in the PureSlang implementation when strings of 100 characters are compared: PureSlang is 15.8 times faster \sd{than what} while Slang+JIT is 16.8 times faster \sd{than what}. This is not the case anymore on 1000-characters strings.
+When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure~\ref{fig:Asm}). However, the switch overhead is still noticeable in the PureSlang implementation when strings of 100 characters are compared: PureSlang is 15.8 times faster than Baseline while Slang+JIT is 16.8 times faster than Baseline. This is not the case anymore on 1000-characters strings.
 This last observation only applies to the GCC results: the code generated by the LLVM compiler induces a longer execution time, as explained in the next paragraph. 
 
 One could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, the performance between the PureSlang and Slang+JIT implementations is really close for long strings (100 characters and longer), with respectively 24,42 and 24,48 relative speed-up factors for a 1000-characters string. Yet performance greatly differs when LLVM is used, with respectively 13,44 and 26,40 relative speed-up factors.
 
-This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure~\ref{fig:Asm}, GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at preserving the registries \sd{registers?} holding the strings (edi and esi), leading to two extra instructions (bolded in the figure) that  load the strings at each iteration.
+This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure~\ref{fig:Asm}, GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at preserving registers holding the strings (edi and esi), leading to two extra instructions (bolded in the figure) that  load the strings at each iteration.
 
 \todo{add conclusion}
 
@@ -917,7 +919,7 @@ These approaches have the advantage of decreasing the primitive maintenance cost
 
 \subsection{No stack switch overhead}
 
-To avoid paying the stack switch cost between the client Stack and the C stack, the V8 team recently wrote an interpreter Ignition \sd{what it is?} in a DSL compiled ahead of time through their JIT back-end to native code. With their primitives and their interpreter written in the DSL, the V8 runtime rarely needs to switch between the client and the C stack (no need to switch to interpret code, no need to switch for primitives). In this context, the stack switch overhead is not a problem anymore.
+To avoid paying the stack switch cost between the client Stack and the C stack, the V8 team recently wrote an interpreter named \emph{Ignition} in a DSL. This interpreter is compiled ahead of time through their JIT back-end to native code. With their primitives and their interpreter written in the DSL, the V8 runtime rarely needs to switch between the client and the C stack (no need to switch to interpret code, no need to switch for primitives). In this context, the stack switch overhead is not a problem anymore.
 
 In our context, implementing a similar approach would require us to compile Slang to native code through our JIT compiler back-end or to rewrite the interpreter on top of Cog JIT's RTL. Slang has some abstractions over native code, similarly to C. Compiling Slang ahead of time to native code efficiently requires us to re-implement optimizations implemented in C compilers and we don't want that complexity or to lower the abstractions level of Slang to express native code optimizations, which would increase the complexity of Slang, which we don't want either. Rewriting the interpreter on top of Cog JIT's RTL is possible but requires a significant amount of work.
 
@@ -927,7 +929,7 @@ In this section we discuss two future work directions and conclude.
 
 \paragraph{Future work: back-end specific.}
 
-All the primitives we compared are written in a processor independent way, due to the C compiler abstraction for the Slang versions, the abstract assembly abstraction for Cog's RTL version or the VM abstraction for the baseline implementation in Smalltalk. We could rewrite the primitive differently for each back-end currently supported (x86, x64, MIPSEL, ARMv6) and yet to support (ARMv8, ...). It could be relevant in some cases performance-wise, for example, on Intel processors, the JVM implements string comparison using the SSE4.2 string comparison instructions when available~\cite{JVMSSE4StringComp}. We did not go in this direction because the maintenance cost in this case is definitely too high since we would have to maintain a different implementation per back-end (already 4 implementations today \sd{that we have or that we would have}).
+All the primitives we compared are written in a processor independent way, due to the C compiler abstraction for the Slang versions, the abstract assembly abstraction for Cog's RTL version or the VM abstraction for the baseline implementation in Smalltalk. We could rewrite the primitive differently for each back-end currently supported (x86, x64, MIPSEL, ARMv6) and yet to support (ARMv8, ...). It could be relevant in some cases performance-wise, for example, on Intel processors, the JVM implements string comparison using the SSE4.2 string comparison instructions when available~\cite{JVMSSE4StringComp}. We did not go in this direction because the maintenance cost is too high since we would have to maintain a different implementation per back-end. We already have four back-ends (x86, x64, MIPSEL, ARMv6) in production.
 
 \paragraph{Future work: adaptive optimizer integration.}
 
