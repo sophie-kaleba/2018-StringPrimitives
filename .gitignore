@@ -1,0 +1,6 @@
+*.aux
+*.blg
+*.synctex*
+*.out
+*.log
+*.texpadtmp/
