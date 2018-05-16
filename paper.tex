@@ -273,24 +273,13 @@ The primitives can be associated either with a name, either with an index in the
 
 \subsection{String comparison primitive}
 \label{subsec:primSpec}
-
-\cba{Cette partie je faisais la queue dans la gare en mm temps, a relire}
-\sd{je ne suis pas sur que je garderais la specification originale car cela n'apporte pas grand-chose.}
- The primitive specification is a bit tedious to explain, since as we were trying to improve its performance, we had to change the specifications. \sk{rephrase bc subsections deleted} In this section we describe first the string implementation, then the original primitive specification and why they were problematic and lastly the new specifications.
+In this section we describe first the string representations then the string comparison primitive specification.
 
 \paragraph{String representations.} Strings are represented on top of the Cog VM in two possible forms: ByteStrings and WideStrings. ByteStrings encode each character of the string in a single byte. The encoding usually follows the extended ASCII standard. WideStrings encode each character in 32 bits. The encoding usually follows Unicode specifications. In this paper, we will discuss only the implementation of the string comparison primitive for ByteStrings. WideStrings use an implementation entirely implemented in the client language, and so far, it has not been reported as a performance bottleneck for any program of any users. To sort arrays of strings, strings can be compared. They can be compared in the default order (ASCII or Unicode) or using different orders, for example, the case insensitive order.
 
-\paragraph{Original specification.}  \sk{delete}The original primitive took three operands. The two first operands were the two ByteStrings to compare and the third operand was the order table, a ByteArray encoding the order of characters. The default order is the ASCII order, hence each entry corresponds to its index in the byte array (The ByteArray has a size of 256, and accessing the element i, with 0 $\leq$ i $\leq$ 255, answered i). However, in some case, the program may do case insensitive ByteStrings comparison. In this case, the order ByteArray is different, since some entries answer the same value (for example, the entry for the 41 and 61, respectively characters A and a, both answer the same value). To compare two ByteStrings, the primitive conceptually iterates byte by byte over the two objects until it reaches the end of one them, comparing for each byte that the value present in the order ByteArray at the index is greater, equal or smaller than the value computed from the other ByteString. If a difference is met, the value returns based on the result, if not, at the end of the iteration the primitive compares the ByteString sizes and returns. Based on the three parameters, the primitive answered 3, 2, or 1 depending if the first ByteString was greater, equal or smaller than the second one.
+\paragraph{Primitive specification.} The String comparison optional primitive takes two or three parameters. The two first operands are the two ByteStrings to compare and the third operand, optional, is the order table (a ByteArray of size 256 encoding the order of characters). If no order is specified, the VM assumes the byte ordering (ASCII order) is the order to compare against, and compares directly the bytes of the ByteStrings. If an order is specified, for example a case insensitive order (the entries for the 41 and 61 in the order byte array, respectively characters A and a in the ASCII table, both answer the same value), the primitive compare the bytes through the indirection order. Having the order optional allows to have quicker string comparison in the common case where the ASCII order is used. The primitive answers a negative integer, zero, or a positive integer as the first parameter is less than, equal to, or greater than the second parameter.
 
-\paragraph{Specification issues.} \sk{delete} As we were trying to optimize string comparison but specifically string equality, we encountered two main issues:
-\begin{itemize}
-	\item \emph{Returned value:} Other programming languages implement the primitive to return a negative integer, 0 or a positive integer instead of 1, 2 or 3. It looks like a minor difference, but it is important for performance. With a negative, 0 or positive value, the primitive can just answer the difference between two different characters or the difference in size if all first characters are equal. With 1, 2, or 3, the primitive has to end with multiple branches to know what number to return. In native code, a subtraction is on common architecture quicker to perform than one or multiple branches. In addition, the primitive code is easier to write with the subtraction when writing directly the assembly instructions and we did exactly that when writing the primitive on top of the JIT's back-end.
-	\item \emph{Order:} Having the order as the third operands is convenient in some cases (case insensitive comparison), but is just overhead in the common case (checking for string equality).
-\end{itemize}
-
-\paragraph{Final specification.} \sk{rename and possibly rephrase}The final specification we productized last month takes two or three parameters. The third parameter, the order, is optional. If the third parameter is absent, the VM assumes the byte ordering (ASCII order) is the order to compare against. Therefore, the VM does not need to go through the indirection order array in the common case. The primitive answers a negative integer, zero, or a positive integer as the first parameter is less than, equal to, or greater than the second parameter.
-
-In the paper we will focus on the comparison of two strings with the default ASCII ordering and measure the performance only of this case. The goal of this work was to improve the performance of common string operations, typically string equality which internally use the primitive, and the cases where the order is non ASCII are uncommon.
+In the paper we will focus on the comparison of two strings with the default ASCII ordering and measure the performance only of this case. The goal of this work was to improve the performance of common string operations, typically string equality which internally uses the primitive, and the cases where the order is non ASCII are considered uncommon.
 
 \section{Different primitive implementations}
 \label{sec:implem}
@@ -301,7 +290,8 @@ In the paper we will focus on the comparison of two strings with the default ASC
 
 
  \subsection{Different implementations and executions}
-We distinguish several implementations: the first one \sk{delete "the first one"? sounds odd}
+ 
+We distinguish several implementations: the baseline in pure Smalltalk, the  \sk{delete "the first one"? sounds odd}
 
 
 \paragraph{Baseline: pure Smalltalk.}
@@ -414,11 +404,11 @@ Each benchmark was measured 30 times.
 %%%
 
 \def\legBase{Baseline}
-\def\legSmartSyntaxPlug{Smart syntax}
+\def\legSmartSyntaxPlug{Syntax}
 \def\legSlangPlug{Plugin}
 \def\legSlang{Pure slang}
 \def\legRTL{Slang+JIT}
-\def\plotHeight{6.4cm}
+\def\plotHeight{6.7cm}
 
 %%%
 % End Legend
