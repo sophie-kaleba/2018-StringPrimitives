@@ -828,9 +828,9 @@ The loop overhead is measured and removed from the measurements.
 
 The two compared strings are equal as this situation corresponds to the worst scenario for most implementations. %There is one less branch in the two plugin implementations in this case.
 
-\subsection{Results} %\sk{Results?}
+\subsection{Results} 
+\cba{Please precise results. x\% for this size showing the problem. y\% for other size so non-existent problem. }
 
-%\cba{Je pense string de taille 0-1 c'est cool pour montrer que le code C va moins vite que pur smalltalk dans ce cas (si c'est vraiment le cas)}
 We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters, using two different compilers: GCC on one hand and LLVM on the other hand. Figure~\ref{fig:bench} shows the results in terms of relative speed-up towards the baseline implementation, respectively for GCC and LLVM.
 
 We can draw the following patterns from these results:
