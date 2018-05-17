@@ -373,6 +373,8 @@ In addition to the previous implementation, we've re-implemented here the primit
 One or another implementation could be preferred depending on the intended aim: the main trade-off is between  engineering time and  performance. Table \ref{tab:cmp_implem} summarizes the main pros and cons related to each implementation: the engineering time tends to increase when more low-level languages are used, such as Cog's RTL for instance.
 Also, a VM recompilation affects the overall complexity of the development process, but the resulting code might be faster to run. Likewise, the use of plugins brings modularity at the cost of some performance loss.
 
+\vfill\null %Title not at bottom of page please
+
 \section{Evaluation}
 \label{sec:eval}
 
@@ -382,7 +384,7 @@ The SlangPlugin, PureSlang and Slang+JIT implementations of this string comparis
 
 \subsection{Set-up}
 
-\cba{All benchs on same VM specifically compiled (normal VM has only one impl)}
+To evaluate the performance, we had to compile a special VM with all the different primitive implementations included. The production VM normally only features one string comparison primitive implementation, not three of them. We compiled one VM for Linux with GCC, and one for Mac with LLVM (exact version numbers below). We ran all benchmarks on the same run of the same VM on both platforms.
 
 \paragraph{GCC-Linux.}The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2.2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
 
@@ -819,10 +821,12 @@ x   y           error
 \end{figure*}
 
 In each benchmark, we run a string comparison in a loop and measure the total execution time.
-The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). This addresses the warm-up of the JIT \cba{??? This needs to be explained differently. We get into jitted code after a small number of loop iteration (I think 20 currently) or second call. The JIT overhead is negligible here for 1 second because we could not see any time spent in the JIT in the profiler + ref to your paper, i.e. less than 0.5ms in the JIT} \cite{CogProfiler} and allows the benchmarks to run at least 1 second in the slower implementations to avoid processor and OS noises.
+The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). The warm-up time of the JIT is in this context not noticeable on the performance results: the primitive is compiled to native code usually at the second call as explained in Section \ref{sec:VMexec} and the VM sampling profiler \cite{CogProfiler} confirms no significant time is spent in the interpreter loop (Between 0 and 1 sample over dozens of thousands are shown in the interpreter loop).
+
+The high number of iterations allows the benchmarks to run at least 1 second in the slower implementations to avoid processor and OS noises.
 The loop overhead is measured and removed from the measurements. 
 
-The two compared strings are equal as this situation corresponds to the worst scenario for most implementations. There is one less branch in the two plugin implementations in this case.
+The two compared strings are equal as this situation corresponds to the worst scenario for most implementations. %There is one less branch in the two plugin implementations in this case.
 
 \subsection{Results} %\sk{Results?}
 
