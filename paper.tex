@@ -587,9 +587,9 @@ x   y           error
 table [y error=error] {
 x   y           error
 1   1           0
-2   25.9913138   0.0320593050
-3   24.868577   0.062229078
-4   27.454826   0.044223466
+2   25.35945   0.1742098
+3   25.42575   0.1621165
+4   26.76261   0.186075
 };
       \end{axis}
     \end{tikzpicture}
@@ -826,8 +826,8 @@ We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1
 We can draw the following patterns from these results:
 \begin{itemize}
 \item The execution time of the Plugin implementations is either very close or greater than \sd{within which ranges? 10\% 200\%} the baseline's for the small strings.
-\item The Slang+JIT implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the PureSlang one tends to decrease as the string size increases. 
-\item The compiler used (either GCC or LLVM) does not lead to significant differences in terms of performance, except for the 100+-characters strings. 
+\item The Slang+JIT implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the PureSlang one \sk{all the Slang versions, in the end} tends to decrease as the string size increases. 
+\item \sk{if we keep these results, then it actually leads to huge differences...} The compiler used (either GCC or LLVM) does not lead to significant differences in terms of performance, except for the 100+-characters strings. 
 \end{itemize}
 
 We can explain these results based on the last 3 criteria detailed in Section~\ref{sec:implem_cmp}:
