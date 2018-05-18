@@ -761,7 +761,7 @@ x   y           error
    \end{subfigure}
    \subcaption*{\textbf{\LLVMMac}\vspace{-0.2cm}} %change vspace based on fig position
     \end{subfigure}
-   \caption{String comparison benchmarks for strings of different sizes on different architectures.}
+   \caption{String comparison benchmarks for strings of different sizes on different architectures. Average relative speed-up regarding baseline. Higher than 1 is better}
    \label{fig:bench}
 \end{figure*}
 \begin{table*}
@@ -787,7 +787,8 @@ x   y           error
 
 \begin{figure*}[b!]
 		\centering
-		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
+		\makebox[0pt]{
+		\includegraphics[width=1.09\linewidth]{figures/asm_cmp.pdf}}
 		\caption{\GCCLinux and \LLVMMac: different optimizations on the comparison loop.}
 		\label{fig:Asm}
 \end{figure*}
