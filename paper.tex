@@ -822,7 +822,7 @@ We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1
 \cba{Is next paragraph good ?}
 We can draw the following patterns from these results:
 \begin{itemize}
-\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, \legSlangPlug is one of the fastest implementation with 
+\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, \legSlangPlug is one of the fastest implementation. 
 \item The \legRTL implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the \legSlangPlug and \legSlang ones tends to decrease as the string size increases, especially for \GCCLinux. For 1000-characters strings, the \legRTL version goes 0,25 times faster than the \legSlangPlug and the \legSlang versions.
 \item The set-up used (either \GCCLinux or \LLVMMac) does lead to significant differences in terms of performance for the Slang implementation. 
 \end{itemize}
@@ -845,9 +845,7 @@ This difference is mainly due to the optimizations performed by both the compile
 
 One can also notice the gap between the Plugin and Slang implementations in LLVM, which does not appear in GCC. \sk{one last comment: WHY?!}
 
-In this section, we compared the performance of the different implementations against a baseline (\emph{i.e.,}{pure Smalltalk code}) implementation. The results showed the \legRTL implementation was always the fastest. Otherwise, most of the performance gaps between the primitive versions could be explained by 3 criteria: stack swithing, optimization for large strings, and the control over generated code.  
-
-
+In this section, we compared the performance of the different implementations against a baseline (\emph{i.e.,}{pure Smalltalk code}) implementation. The results showed the \legRTL implementation was always the fastest. Otherwise, most of the performance gaps between the primitive versions could be explained by 3 criteria: stack swithing, optimization for large strings, and the control over generated code.
 
 %We can draw the following patterns from these results:
 %\begin{itemize}
