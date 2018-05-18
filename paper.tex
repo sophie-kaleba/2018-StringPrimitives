@@ -90,6 +90,8 @@
 \def\legSlangPlug{Plugin\xspace}
 \def\legSlang{Slang\xspace}
 \def\legRTL{Slang+RTL\xspace}
+\def\LLVMMac{LLVM-Mac\xspace}
+\def\GCCLinux{GCC-Linux\xspace}
 \def\plotHeight{7cm}
 
 %%%
@@ -386,9 +388,9 @@ The \legSlangPlug, \legSlang and \legRTL implementations of this string comparis
 
 To evaluate the performance, we had to compile a special VM with all the different primitive implementations included. The production VM normally only features one string comparison primitive implementation, not three of them. We compiled one VM for Linux with GCC, and one for Mac with LLVM (exact version numbers below). We ran all benchmarks on the same run of the same VM on both platforms.
 
-\paragraph{GCC-Linux.}The GCC-Linux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2.2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
+\paragraph{\GCCLinux.}The \GCCLinux evaluation was performed on an Asus Zenbook with Ubuntu 16.04 LTS, a 2.2 Ghz processor Intel Core 5, 8 Gb 1600MHz DDR3 of RAM. The Linux VM was compiled using GCC version 5.4.0.
 
-\paragraph{LLVM-Mac.}The LLVM-Mac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9 Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38).
+\paragraph{\LLVMMac.}The \LLVMMac evaluation was performed on a MacBook pro with Mac OS 10.11.6, a 2.9 Ghz processor Intel Core 5, 8 Gb 1867MHz DDR3 of RAM. The Mac VM was compiled using Apple LLVM version 8.0.0 (clang-800.0.38).
 
 \paragraph{Processor.}The following evaluation was performed on 32 bits Intel VMs (x86).
 
@@ -576,7 +578,7 @@ x   y           error
    \end{subfigure}
   % \caption{GCC-Linux results}
    % \label{fig:gcc}
-   \subcaption*{\textbf{GCC-Linux}\vspace{0.25cm}}
+   \subcaption*{\textbf{\GCCLinux}\vspace{0.25cm}}
    \label{fig:gcc}
    \end{subfigure}
  \begin{subfigure}[b]{\textwidth}
@@ -757,7 +759,7 @@ x   y           error
     \end{tikzpicture}
 
    \end{subfigure}
-   \subcaption*{\textbf{LLVM-Mac}\vspace{-0.2cm}} %change vspace based on fig position
+   \subcaption*{\textbf{\LLVMMac}\vspace{-0.2cm}} %change vspace based on fig position
     \end{subfigure}
    \caption{String comparison benchmarks for strings of different sizes on different architectures.}
    \label{fig:bench}
@@ -768,14 +770,14 @@ x   y           error
   \hline
     & & 0 & 1 & 5 & 100 & 1000 \\
 \hline
-  \multirow{2}{*}{\legSlangPlug} &GCC-Linux& 0.4222 $\pm$ 0.0008 & 0.7674 $\pm$ 0.0011 & 1.8906 $\pm$ 0.0119 & 13.1218 $\pm$ 0.0171  & 25.3595 $\pm$ 0.1742 \\
-  						&LLVM-Mac& 0.3856 $\pm$ 0.0004 & 0.6685 $\pm$ 0.0010 & 1.6387 $\pm$ 0.0101 & 11.6376 $\pm$ 0.0576  & 23.9579 $\pm$ 0.1390 \\
+  \multirow{2}{*}{\legSlangPlug} &\GCCLinux& 0.422 $\pm$ 0.0008 & 0.767 $\pm$ 0.0011 & 1.891 $\pm$ 0.0119 & 13.12 $\pm$ 0.0171  & 25.36 $\pm$ 0.1742 \\
+  						&\LLVMMac& 0.386 $\pm$ 0.0004 & 0.669 $\pm$ 0.0010 & 1.639 $\pm$ 0.0101 & 11.64 $\pm$ 0.0576  & 23.96 $\pm$ 0.1390 \\
    \hline
-  \multirow{2}{*}{\legSlang} &GCC-Linux& 1.0288 $\pm$ 0.0046 & 1.8431 $\pm$ 0.0116 & 4.0412 $\pm$ 0.0611 & 17.7084 $\pm$ 0.1059 & 25.4258 $\pm$ 0.1621\\
- 					 &LLVM-Mac& 0.2088 $\pm$ 0.0002 & 0.3649 $\pm$ 0.0064 & 0.8953 $\pm$ 0.0056 & 6.1978 $\pm$ 0.0180  & 10.6698 $\pm$ 0.0066 \\
+  \multirow{2}{*}{\legSlang} &\GCCLinux& 1.029 $\pm$ 0.0046 & 1.843 $\pm$ 0.0116 & 4.041 $\pm$ 0.0611 & 17.71 $\pm$ 0.1059 & 25.43 $\pm$ 0.1621\\
+ 					 &\LLVMMac& 0.209 $\pm$ 0.0002 & 0.365 $\pm$ 0.0064 & 0.895 $\pm$ 0.0056 & 6.198 $\pm$ 0.0180  & 10.67 $\pm$ 0.0066 \\
    \hline
-  \multirow{2}{*}{\legRTL}  &GCC-Linux& 2.4290 $\pm$ 0.0029 & 3.5170 $\pm$ 0.0197  & 7.1216 $\pm$ 0.0105 & 18.5537 $\pm$ 0.0238 & 26.7626 $\pm$ 0.1861\\
- 				 	&LLVM-Mac & 2.5718 $\pm$ 0.0035 & 3.5919 $\pm$ 0.0076 & 6.9569 $\pm$ 0.0416 & 17.2747 $\pm$ 0.1071  & 25.3991 $\pm$ 0.1811 \\
+  \multirow{2}{*}{\legRTL}  &\GCCLinux& 2.429 $\pm$ 0.0029 & 3.517 $\pm$ 0.0197  & 7.122 $\pm$ 0.0105 & 18.55 $\pm$ 0.0238 & 26.76 $\pm$ 0.1861\\
+ 				 	&\LLVMMac & 2.572 $\pm$ 0.0035 & 3.592 $\pm$ 0.0076 & 6.957 $\pm$ 0.0416 & 17.28 $\pm$ 0.1071  & 25.40 $\pm$ 0.1811 \\
   \hline
 \end{tabular} 
 \vspace{0.2cm}
@@ -786,7 +788,7 @@ x   y           error
 \begin{figure*}[b!]
 		\centering
 		\includegraphics[width=1\linewidth]{figures/asm_cmp.pdf}
-		\caption{GCC and LLVM: different optimizations on the comparison loop.}
+		\caption{\GCCLinux and \LLVMMac: different optimizations on the comparison loop.}
 		\label{fig:Asm}
 \end{figure*}
 
@@ -804,7 +806,7 @@ We assessed the execution time of the different implementations by running the f
 		ifFalse: [iterations := (10000000 // size sqrt) floor.].
 	overhead := [ 1 to: iterations do: [ :i | ] ] timeToRun.
 	time := [ 1 to: iterations do: [ :i |
-		collection compareWithSlang: collection2 ] ] timeToRun.
+		collection primitiveStringCompare: collection2 ] ] timeToRun.
 	stream nextPutAll: ((time - overhead) asString)].
 \end{code}\\
 
@@ -812,37 +814,38 @@ Each benchmark was measured 30 times. Each time, we run a string comparison in a
 
 The number of iterations of the loop depends on the string size: the comparison is repeated between 1414 and 10000 times for a short string (5 characters or less), and between 100 and 316 times for a long string (100 characters or more). The warm-up time of the JIT is in this context not noticeable on the performance results: the primitive is compiled to native code usually at the second call as explained in Section \ref{sec:VMexec} and the VM sampling profiler \cite{CogProfiler} confirms no significant time is spent in the interpreter loop (Between 0 and 1 sample over dozens of thousands are shown in the interpreter loop). The number of iterations allows the benchmarks to run for at least 1 second in the slower implementations to avoid processor and OS noises. 
 
-The loop overhead is measured and removed from the measurements. The two compared strings are equal as this situation corresponds to the worst scenario for most implementations. %There is one less branch in the two plugin implementations in this case.
+The loop overhead is measured and removed from the measurements (We made sure the JIT did not remove the dead loop to measure it). The two compared strings are equal as this situation corresponds to the worst scenario for most implementations. %There is one less branch in the two plugin implementations in this case.
 
 \subsection{Results} 
-We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters. In the case of small strings, most of the time is spent activating the primitive and in the code before the main comparison loop, the primitive is performed with a little overall number of native instructions. In the case of large strings, the time spent executing the primitive is dominated by the main comparison loop. Figure~\ref{fig:bench} shows the results in terms of relative speed-up towards the baseline implementation, respectively for GCC-Linux and LLVM-Mac.
+We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters. In the case of small strings, most of the time is spent activating the primitive and in the code before the main comparison loop, the primitive is performed with a little overall number of native instructions. In the case of large strings, the time spent executing the primitive is dominated by the main comparison loop. Figure~\ref{fig:bench} shows the results in terms of relative speed-up towards the baseline implementation, respectively for \GCCLinux and \LLVMMac.
 
+\cba{Is next paragraph good ?}
 We can draw the following patterns from these results:
 \begin{itemize}
-\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, the performance is comparable to 
-\item The \legRTL implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the \legSlangPlug and \legSlang ones tends to decrease as the string size increases, especially for GCC. For 1000-characters strings, the \legRTL version goes 0,25 times faster than the \legSlangPlug and the \legSlang versions.
-\item The compiler used (either GCC or LLVM) does lead to significant differences in terms of performance for the Slang implementation. 
+\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, \legSlangPlug is one of the fastest implementation with 
+\item The \legRTL implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the \legSlangPlug and \legSlang ones tends to decrease as the string size increases, especially for \GCCLinux. For 1000-characters strings, the \legRTL version goes 0,25 times faster than the \legSlangPlug and the \legSlang versions.
+\item The set-up used (either \GCCLinux or \LLVMMac) does lead to significant differences in terms of performance for the Slang implementation. 
 \end{itemize}
 
 We can explain these results based on the last 3 criteria detailed in Section~\ref{sec:implem_cmp}:
 
 \paragraph{Stack switch overhead.}
-As mentioned in Section~\ref{sec:VMexec}, all implementations written in Slang come with an overhead due to the switch between the C and Smalltalk stacks. This overhead is clearly visible in the bench results in Figure~\ref{fig:bench} for small strings (size 1 or less): the Plugin implementation is between 57,8 (gcc) to 61,4\% (llvm) slower than the baseline's for empty strings.
+As mentioned in Section~\ref{sec:VMexec}, all implementations written in Slang come with an overhead due to the switch between the C and Smalltalk stacks. This overhead is clearly visible in the bench results in Figure~\ref{fig:bench} for small strings (size 1 or less): the Plugin implementation is between 57,8 (\GCCLinux) to 61,4\% (\LLVMMac) slower than the baseline's for empty strings.
 As the string size goes larger, the overhead is less significant because it is absorbed by other performance gains.
 Regarding this criteria, \legRTL version is always the fastest as it is not impacted by the switch overhead.
 
 \paragraph{Optimization potential on large strings comparison.}
 The Plugin come with an overhead due the use of an interface. Besides, cross-file inlining is not performed for plugin, like said in Section~\ref{sec:implem_cmp}. These are some of the factors explaining the performance gap between these versions and the \legSlang and \legRTL ones.
 When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure~\ref{fig:Asm}). However, the switch overhead is still noticeable in the Slang implementation when strings of 100 characters are compared: Slang is 17.7 times faster than Baseline while Slang+JIT is 18,6 times faster than Baseline. 
-This last observation only applies to the GCC results: the code generated by the LLVM compiler induces a longer execution time, as explained in the next paragraph. 
+This last observation only applies to the \GCCLinux results: the code generated by the LLVM compiler induces a longer execution time, as explained in the next paragraph. 
 
-\paragraph{Control over generated code.} One could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, the performance between the Slang and Slang+JIT implementations is really close for long strings (100 characters and longer), with respectively 25,42 and 26,76 relative speed-up factors for a 1000-characters string. Yet performance greatly differs when LLVM is used, with respectively 10,67 and 25,4 relative speed-up factors.
+\paragraph{Control over generated code.} One could notice a rather striking performance difference between the 2 compilers: when compiling with GCC, the performance between the \legSlang and \legRTL implementations is really close for long strings (100 characters and longer), with respectively 25,42 and 26,76 relative speed-up factors for a 1000-characters string. Yet performance greatly differs when LLVM is used, with respectively 10,67 and 25,4 relative speed-up factors.
 
 This difference is mainly due to the optimizations performed by both the compilers: as depicted in Figure~\ref{fig:Asm}, GCC generates instructions that are very close to the ones generated by the JIT, hence the similar speed-up factors. On the contrary, LLVM generates more instructions: it especially fails at preserving registers holding the strings (edi and esi), leading to two extra instructions (bolded in the figure) that  load the strings at each iteration.
 
 One can also notice the gap between the Plugin and Slang implementations in LLVM, which does not appear in GCC. \sk{one last comment: WHY?!}
 
-In this section, we compared the performance of the different implementations against a baseline (\emph{i.e.,}{pure Smalltalk code}) implementation. The results showed the Slang+JIT implementation was always the fastest. Otherwise, most of the performance gaps between the primitive versions could be explained by 3 criteria: stack swithing, optimization for large strings, and the control over generated code.  
+In this section, we compared the performance of the different implementations against a baseline (\emph{i.e.,}{pure Smalltalk code}) implementation. The results showed the \legRTL implementation was always the fastest. Otherwise, most of the performance gaps between the primitive versions could be explained by 3 criteria: stack swithing, optimization for large strings, and the control over generated code.  
 
 
 
