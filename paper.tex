@@ -761,7 +761,7 @@ x   y           error
    \end{subfigure}
    \subcaption*{\textbf{\LLVMMac}\vspace{-0.2cm}} %change vspace based on fig position
     \end{subfigure}
-   \caption{String comparison benchmarks for strings of different sizes on different architectures. Average relative speed-up regarding baseline. Higher than 1 is better}
+   \caption{String comparison benchmarks for strings of different sizes on different architectures. Average relative speed-up regarding baseline. Higher than 1 is better.}
    \label{fig:bench}
 \end{figure*}
 \begin{table*}
@@ -820,15 +820,15 @@ The loop overhead is measured and removed from the measurements (We made sure th
 \subsection{Results} 
 We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters. In the case of small strings, most of the time is spent activating the primitive and in the code before the main comparison loop, the primitive is performed with a little overall number of native instructions. In the case of large strings, the time spent executing the primitive is dominated by the main comparison loop. Figure~\ref{fig:bench} shows the results in terms of relative speed-up towards the baseline implementation, respectively for \GCCLinux and \LLVMMac.
 
-\cba{Is next paragraph good ?}
-We can draw the following patterns from these results:
-\begin{itemize}
-\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, \legSlangPlug is one of the fastest implementation. 
-\item The \legRTL implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the \legSlangPlug and \legSlang ones tends to decrease as the string size increases, especially for \GCCLinux. For 1000-characters strings, the \legRTL version goes 0,25 times faster than the \legSlangPlug and the \legSlang versions.
-\item The set-up used (either \GCCLinux or \LLVMMac) does lead to significant differences in terms of performance for the Slang implementation. 
-\end{itemize}
+%\cba{Is next paragraph good ?}
+%We can draw the following patterns from these results:
+%\begin{itemize}
+%\item The \legSlangPlug implementation is slower than the baseline version for small strings (0,58 times slower for empty strings, 0,23 times slower for 1-character strings). This is due to the overhead of the calls to the main VM to access the object headers and the stack. On large strings, \legSlangPlug is one of the fastest implementation. 
+%\item The \legRTL implementation is more efficient than the baseline in every case. Nevertheless, the performance gap between this version and the \legSlangPlug and \legSlang ones tends to decrease as the string size increases, especially for \GCCLinux. For 1000-characters strings, the \legRTL version goes 0,25 times faster than the \legSlangPlug and the \legSlang versions.
+%\item The set-up used (either \GCCLinux or \LLVMMac) does lead to significant differences in terms of performance for the Slang implementation. 
+%\end{itemize}
 
-We can explain these results based on the last 3 criteria detailed in Section~\ref{sec:implem_cmp}:
+These results can be explained based on the last 3 criteria detailed in Section~\ref{sec:implem_cmp}:
 
 \paragraph{Stack switch overhead.}
 As mentioned in Section~\ref{sec:VMexec}, all implementations written in Slang come with an overhead due to the switch between the C and Smalltalk stacks. This overhead is clearly visible in the bench results in Figure~\ref{fig:bench} for small strings (size 1 or less): the Plugin implementation is between 57,8 (\GCCLinux) to 61,4\% (\LLVMMac) slower than the baseline's for empty strings.
@@ -836,7 +836,7 @@ As the string size goes larger, the overhead is less significant because it is a
 Regarding this criteria, \legRTL version is always the fastest as it is not impacted by the switch overhead.
 
 \paragraph{Optimization potential on large strings comparison.}
-The Plugin come with an overhead due the use of an interface. Besides, cross-file inlining is not performed for plugin, like said in Section~\ref{sec:implem_cmp}. These are some of the factors explaining the performance gap between these versions and the \legSlang and \legRTL ones.
+The Plugin comes with an overhead due the use of an interface. Besides, cross-file inlining is not performed for plugin, like said in Section~\ref{sec:implem_cmp}. These are some of the factors explaining the performance gap between these versions and the \legSlang and \legRTL ones.
 When it comes to comparing large strings (100 characters and more), the execution time is mainly spent in the comparison loop (Figure~\ref{fig:Asm}). However, the switch overhead is still noticeable in the Slang implementation when strings of 100 characters are compared: Slang is 17.7 times faster than Baseline while Slang+JIT is 18,6 times faster than Baseline. 
 This last observation only applies to the \GCCLinux results: the code generated by the LLVM compiler induces a longer execution time, as explained in the next paragraph. 
 
