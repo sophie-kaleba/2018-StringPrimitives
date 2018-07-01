@@ -101,7 +101,7 @@
 %\titlebanner{banner above paper title}        % These are ignored unless
 \preprintfooter{Assessing primitives performance on multi-stage execution}   % 'preprint' option specified.
 
-\title{Assessing primitives performance\\ on multi-stage execution \todo{modify maybe}}
+\title{Assessing primitives performance\\ on multi-stage \st{execution} implementations}
 %\subtitle{Subtitle Text, if any\titlenote{with optional subtitle note}}
 
 \authorinfo{Sophie Kaleba}
@@ -119,6 +119,7 @@
 
 \maketitle
 
+\begin{abstract}
 Virtual machines, besides the interpreter and just-in-time compiler optimization facilities, also include a set of primitive operations that the client language can use. Some of these are essential and cannot be performed in any other way. Others are optional: they can be expressed in the client language but are often implemented in the virtual machine to improve performance when the just-in-time compiler is unable to do so (start-up performance, speculative optimizations not implemented or not mature enough, etc.).
 
 In a hybrid runtime, where code is executed by an interpreter and a just-in-time compiler, the implementor can choose to implement optional primitives in the client language, in the virtual machine implementation language (typically C or C++), or on top of the just-in-time compiler back-end. This raises the question of the maintenance and performance trade-offs of the different alternatives. As a case study, we implemented the String comparison optional primitive in each case. This paper describes the different implementations, discusses the maintenance cost of each of them and evaluates for different string sizes the execution time in Cog, a Smalltalk virtual machine.
@@ -781,7 +782,6 @@ x   y           error
 \end{figure*}
 
 \subsection{Methodology}
-\todo{so now I have to figure out how to actually bootstrap errors computed that way}
 
 We assessed the execution time of the different implementations by running the following benchmark:
 
@@ -808,6 +808,7 @@ The loop overhead is measured and removed from the measurements (We made sure th
 
 \subsection{Results} 
 We performed the benchmarks upon five different string sizes: 0, 1, 5, 100 and 1000 characters. In the case of small strings, most of the time is spent activating the primitive and in the code before the main comparison loop, the primitive is performed with a little overall number of native instructions. In the case of large strings, the time spent executing the primitive is dominated by the main comparison loop. Figure~\ref{fig:bench} and Table \ref{tab:detail_bench} show the results in terms of relative speed-up towards the baseline implementation, respectively for \GCCLinux and \LLVMMac.
+The relative speed-up is obtained by dividing the baseline results by the execution times. Both the figure and the table shows bootstrapped standard errors. \todo{add ref for bootstrap ?}
 
 %\cba{Is next paragraph good ?}
 %We can draw the following patterns from these results:
@@ -915,6 +916,7 @@ In this paper we compared four different implementations of the string compariso
 
 \acks
 \todo{add acknowledgments}
+Eliot, Levente
 Acknowledgments, if needed.
 
 % The 'abbrvnat' bibliography style is recommended.
